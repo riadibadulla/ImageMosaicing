@@ -28,19 +28,37 @@ h2, w2 = img2.shape[:2]
 
 oldMax = calculate_loss(get_intersection(SHIFT_CONST,img1,img2,h1,h2))/(SHIFT_CONST*h1)
 maxShift = 1
-for i in range(2,100):
+stageIsOne = None
+for i in range(2,min(w1,w2)):
     print("Loop ",i+1)
     intersection = get_intersection(i,img1,img2,h1,h2)
     loss = calculate_loss(intersection)/(i*h1)
     if  loss < oldMax:
         oldMax = loss
         maxShift = i
+        stageIsOne = True
+
+img1,img2 = img2, img1
+w1,w2 = w2,w1
+
+for i in range(2,min(w1,w2)):
+    print("Loop ",i+1)
+    intersection = get_intersection(i,img1,img2,h1,h2)
+    loss = calculate_loss(intersection)/(i*h1)
+    if  loss < oldMax:
+        oldMax = loss
+        maxShift = i
+        stageIsOne = False
 SHIFT_CONST = maxShift
 
+if stageIsOne:
+    img1,img2 = img2, img1
+    w1,w2 = w2,w1
 
 vis = np.zeros((max(h1, h2), w1+w2,3), np.uint8)
 vis[:h1, :w1,:3] = img1
 vis[:h2, w1-SHIFT_CONST:w1+w2-SHIFT_CONST,:3] = img2
+
 
 print("Shift: ",SHIFT_CONST)
 cv2.imwrite("output.jpg",vis)
