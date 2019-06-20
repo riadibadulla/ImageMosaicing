@@ -12,10 +12,7 @@ def get_intersection(SHIFT,img1,img2,h1,h2):
 
 def calculate_loss(intersection):
     loss = 0
-    for i in range(len(intersection[0])):
-        for j in range(len(intersection[0][0])):
-            for rgb in range(3):
-                loss+=abs(intersection[1][i][j][rgb]-intersection[0][i][j][rgb])
+    loss = np.sum(np.absolute(np.subtract(intersection[1],intersection[0])))
     return loss
 
 SHIFT_CONST = 1
