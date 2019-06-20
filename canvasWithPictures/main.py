@@ -23,18 +23,20 @@ SHIFT_CONST = 1
 # Timing
 START_TIME = time.time()
 
-img1 = cv2.imread('/cs/home/ri31/project-scripts/canvasWithPictures/images/andrews1.png')
-img2 = cv2.imread('/cs/home/ri31/project-scripts/canvasWithPictures/images/andrews2.png')  
+img1 = cv2.imread('/cs/home/ri31/project-scripts/canvasWithPictures/images/Map1.png')
+img2 = cv2.imread('/cs/home/ri31/project-scripts/canvasWithPictures/images/Map2.png')  
 
 h1, w1 = img1.shape[:2]
 h2, w2 = img2.shape[:2]
 
 oldMax = calculate_loss(get_intersection(SHIFT_CONST,img1,img2,h1,h2))/(SHIFT_CONST*h1)
 maxShift = 1
-for i in range(2,300):
+for i in range(2,100):
     print("Loop ",i+1)
-    if calculate_loss(get_intersection(i,img1,img2,h1,h2))/(i*h1) < oldMax:
-        oldMax = calculate_loss(get_intersection(i,img1,img2,h1,h2))
+    intersection = get_intersection(i,img1,img2,h1,h2)
+    loss = calculate_loss(intersection)/(i*h1)
+    if  loss < oldMax:
+        oldMax = loss
         maxShift = i
 SHIFT_CONST = maxShift
 
