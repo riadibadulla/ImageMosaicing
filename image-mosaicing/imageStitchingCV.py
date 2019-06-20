@@ -5,9 +5,9 @@ from random import randrange
 
 #https://towardsdatascience.com/image-stitching-using-opencv-817779c86a83
 
-img_ = cv2.imread("right.jpg")
+img_ = cv2.imread("Map1.png")
 img1 = cv2.cvtColor(img_,cv2.COLOR_BGR2GRAY)
-img = cv2.imread("left.jpg")
+img = cv2.imread("Map2.png")
 img2 = cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
 
 sift = cv2.xfeatures2d.SIFT_create()
