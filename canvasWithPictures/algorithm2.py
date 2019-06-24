@@ -45,14 +45,6 @@ img2 = cv2.imread('/cs/home/ri31/project-scripts/canvasWithPictures/images/Map2.
 h1, w1 = img1.shape[:2]
 h2, w2 = img2.shape[:2]
 
-scale1 = 190/w1
-scale2 = 190/w2
-img1 = cv2.resize(img1,None,fx=scale1,fy=scale1)
-img2 = cv2.resize(img2,None,fx=scale2,fy=scale2)
-
-h1, w1 = img1.shape[:2]
-h2, w2 = img2.shape[:2]
-
 SHIFT_X = 1
 SHIFT_Y = 1
 
