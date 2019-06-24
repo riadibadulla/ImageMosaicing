@@ -23,42 +23,33 @@ def getIntersectionCoordinates(h1,w1,h2,w2,SHIFT_X,SHIFT_Y):
 
 def calculateLoss(canvas, SHIFT_X,SHIFT_Y,h1,w1,h2,w2):
     coor = getIntersectionCoordinates(h1,w1,h2,w2,SHIFT_X,SHIFT_Y)
-    image1 = canvas[0,coor[3]:coor[1],coor[0]:coor[2],:3]
-    image2 = canvas[1,coor[3]:coor[1],coor[0]:coor[2],:3]
+    image1 = canvas[0,coor[3]:coor[1],coor[0]:coor[2]]
+    image2 = canvas[1,coor[3]:coor[1],coor[0]:coor[2]]
     loss = np.mean(np.absolute(np.subtract(image1,image2)))
     return loss
 
 def drawImage(X,Y):
-    vis = np.zeros((h1*2+h2,w1*2+w2,3), dtype=np.uint8)
-    vis[Y:h1+Y,X:w1+X,:3] = img1
-    vis[h1:h2+h1, w1:w1+w2,:3] = img2
+    vis = np.zeros((h1*2+h2,w1*2+w2), dtype=np.uint8)
+    vis[Y:h1+Y,X:w1+X] = img1
+    vis[h1:h2+h1, w1:w1+w2] = img2
     cv2.imshow('image',vis)
-    cv2.waitKey(10)
+    cv2.waitKey(7)
 
 START_TIME = time.time()
 
-
-
-img1 = cv2.imread('/cs/home/ri31/project-scripts/canvasWithPictures/images/Map1.png')
-img2 = cv2.imread('/cs/home/ri31/project-scripts/canvasWithPictures/images/Map2.png')  
-
-h1, w1 = img1.shape[:2]
-h2, w2 = img2.shape[:2]
-
-scale1 = 190/w1
-scale2 = 190/w2
-img1 = cv2.resize(img1,None,fx=scale1,fy=scale1)
-img2 = cv2.resize(img2,None,fx=scale2,fy=scale2)
-
-h1, w1 = img1.shape[:2]
-h2, w2 = img2.shape[:2]
+img1 = cv2.imread('/cs/home/ri31/project-scripts/canvasWithPictures/images/Map5.png',0)
+img2 = cv2.imread('/cs/home/ri31/project-scripts/canvasWithPictures/images/Map6.png',0)  
 
 SHIFT_X = 1
 SHIFT_Y = 1
 
-canvas = np.zeros((2,h1*2+h2,w1*2+w2,3), dtype=np.uint8)
-canvas[0,:h1,:w1,:3] = img1
-canvas[1,h1:h2+h1, w1:w1+w2,:3] = img2
+h1, w1 = img1.shape[:2]
+h2, w2 = img2.shape[:2]
+
+
+canvas = np.zeros((2,h1*2+h2,w1*2+w2), dtype=np.uint8)
+canvas[0,:h1,:w1] = img1
+canvas[1,h1:h2+h1, w1:w1+w2] = img2
 
 BestLoss = calculateLoss(canvas,SHIFT_X,SHIFT_Y,h1,w1,h2,w2)
 SHIFT_Y=2
@@ -67,27 +58,26 @@ BestY = 1
 
 while(SHIFT_X<w1+w2):
     print(SHIFT_X)
-    #drawImage(SHIFT_X,SHIFT_Y)
     while(SHIFT_Y<h1+h2):
         loss = calculateLoss(canvas,SHIFT_X,SHIFT_Y,h1,w1,h2,w2)
+        # drawImage(SHIFT_X,SHIFT_Y)
         print(SHIFT_X)
         if loss<BestLoss:
-            #drawImage(SHIFT_X,SHIFT_Y)
             BestLoss = loss
             BestX = SHIFT_X
             BestY = SHIFT_Y
         SHIFT_Y+=1
         canvas[0].fill(0)
-        canvas[0,SHIFT_Y:h1+SHIFT_Y,SHIFT_X:w1+SHIFT_X,:3] = img1
+        canvas[0,SHIFT_Y:h1+SHIFT_Y,SHIFT_X:w1+SHIFT_X] = img1
     SHIFT_Y = 0
     SHIFT_X+=1
     canvas[0].fill(0)
-    canvas[0,SHIFT_Y:h1+SHIFT_Y,SHIFT_X:w1+SHIFT_X,:3] = img1
+    canvas[0,SHIFT_Y:h1+SHIFT_Y,SHIFT_X:w1+SHIFT_X] = img1
 
 
-vis = np.zeros((h1*2+h2,w1*2+w2,3), dtype=np.uint8)
-vis[BestY:h1+BestY,BestX:w1+BestX,:3] = img1
-vis[h1:h2+h1, w1:w1+w2,:3] = img2
+vis = np.zeros((h1*2+h2,w1*2+w2), dtype=np.uint8)
+vis[BestY:h1+BestY,BestX:w1+BestX] = img1
+vis[h1:h2+h1, w1:w1+w2] = img2
 cv2.imshow('image',vis)
 END_TIME = time.time()
 print("Time taken: ", format(END_TIME - START_TIME), " seconds")
