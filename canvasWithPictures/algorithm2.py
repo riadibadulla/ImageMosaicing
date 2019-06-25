@@ -19,12 +19,12 @@ def getIntersectionCoordinates(h1,w1,h2,w2,SHIFT_X,SHIFT_Y):
     # if (x5 > x6 or y5 > y6) : 
     #     print("No intersection") 
     #     return
-    return (x5,y5,x6,y6)
+    return {'x5':x5,'y5':y5,'x6':x6,'y6':y6}
 
 def calculateLoss(canvas, SHIFT_X,SHIFT_Y,h1,w1,h2,w2):
     coor = getIntersectionCoordinates(h1,w1,h2,w2,SHIFT_X,SHIFT_Y)
-    image1 = canvas[0,coor[3]:coor[1],coor[0]:coor[2],:3]
-    image2 = canvas[1,coor[3]:coor[1],coor[0]:coor[2],:3]
+    image1 = canvas[coor['y6']-SHIFT_Y:coor['y5']-SHIFT_Y,coor['x5']-SHIFT_X:coor['x6']-SHIFT_X,:3]
+    image2 = canvas[coor['y6']:coor['y5'],coor['x5']:coor['x6'],:3]
     loss = np.mean(np.absolute(np.subtract(image1,image2)))
     return loss
 
@@ -48,9 +48,9 @@ h2, w2 = img2.shape[:2]
 SHIFT_X = 1
 SHIFT_Y = 1
 
-canvas = np.zeros((2,h1*2+h2,w1*2+w2,3), dtype=np.uint8)
-canvas[0,:h1,:w1,:3] = img1
-canvas[1,h1:h2+h1, w1:w1+w2,:3] = img2
+canvas = np.zeros((h1*2+h2,w1*2+w2,3), dtype=np.uint8)
+canvas[:h1,:w1,:3] = img1
+canvas[h1:h2+h1, w1:w1+w2,:3] = img2
 
 BestLoss = calculateLoss(canvas,SHIFT_X,SHIFT_Y,h1,w1,h2,w2)
 SHIFT_Y=2
@@ -69,12 +69,8 @@ while(SHIFT_X<w1+w2):
             BestX = SHIFT_X
             BestY = SHIFT_Y
         SHIFT_Y+=1
-        canvas[0].fill(0)
-        canvas[0,SHIFT_Y:h1+SHIFT_Y,SHIFT_X:w1+SHIFT_X,:3] = img1
     SHIFT_Y = 0
     SHIFT_X+=1
-    canvas[0].fill(0)
-    canvas[0,SHIFT_Y:h1+SHIFT_Y,SHIFT_X:w1+SHIFT_X,:3] = img1
 
 
 vis = np.zeros((h1*2+h2,w1*2+w2,3), dtype=np.uint8)
