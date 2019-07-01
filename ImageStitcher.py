@@ -1,6 +1,7 @@
 import cv2
 import numpy as np
 import time 
+import math
 
 class ImageStitcher:
     img1 = None
@@ -8,6 +9,7 @@ class ImageStitcher:
     h1,h2,w1,w2 = 0,0,0,0
     BestX = 1
     BestY = 1
+    Best_Rotate = 1
 
     def __init__(self, img1, img2, resize):
         self.img1 = img1
@@ -53,31 +55,49 @@ class ImageStitcher:
         cv2.imshow('image',vis)
         cv2.waitKey(500)
 
+    def rotateImage(self,angleInDegrees):
+        thetha = angleInDegrees * math.pi/180
+        a = math.cos(thetha)
+        b = math.sin(thetha)
+        canvas = np.zeros((self.h1*2+self.h2,self.w1*2+self.w2,3), dtype=np.uint8)
+        canvas[self.h1:self.h2+self.h1, self.w1:self.w1+self.w2,:3] = self.img2
+        h, w = canvas.shape[:2]
+        M = np.float32([[a,b,(1-a)*w/2-b*h/2],[-b,a,b*w/2+(1-a)*h/2],[0,0,1]])
+        canvas = cv2.warpPerspective(canvas,M,(w,h))
+        canvas[:self.h1,:self.w1,:3] = self.img1
+        return canvas
+
 
     def mosaicImages(self):
         SHIFT_X = 1
         SHIFT_Y = 1
-
         canvas = np.zeros((self.h1*2+self.h2,self.w1*2+self.w2,3), dtype=np.uint8)
-        canvas[:self.h1,:self.w1,:3] = self.img1
         canvas[self.h1:self.h2+self.h1, self.w1:self.w1+self.w2,:3] = self.img2
+        canvas[:self.h1,:self.w1,:3] = self.img1
 
         BestLoss = self.calculateLoss(canvas,SHIFT_X,SHIFT_Y,self.h1,self.w1,self.h2,self.w2)
         SHIFT_Y=2
-        while(SHIFT_X<self.w1+self.w2):
-            print("SHIFTX:",SHIFT_X)
-            #drawImage(SHIFT_X,SHIFT_Y)
-            while(SHIFT_Y<self.h1+self.h2):
-                loss = self.calculateLoss(canvas,SHIFT_X,SHIFT_Y,self.h1,self.w1,self.h2,self.w2)
-                #drawImage(SHIFT_X,SHIFT_Y)
-                print("LOSS: ",loss,"BestLoss: ",BestLoss)
-                if loss<BestLoss:
-                    self.drawImage(SHIFT_X,SHIFT_Y)
-                    BestLoss = loss
-                    self.BestX = SHIFT_X
-                    self.BestY = SHIFT_Y
-                SHIFT_Y+=1
-            SHIFT_Y = 1
-            SHIFT_X+=1
+
+        for degree in range(1,360):
+            cv2.imshow('image',canvas)
+            cv2.waitKey(500)
+            while(SHIFT_X<self.w1+self.w2):
+                print("SHIFTX:",SHIFT_X)
+                # self.drawImage(SHIFT_X,SHIFT_Y)
+                while(SHIFT_Y<self.h1+self.h2):
+                    loss = self.calculateLoss(canvas,SHIFT_X,SHIFT_Y,self.h1,self.w1,self.h2,self.w2)
+                    #drawImage(SHIFT_X,SHIFT_Y)
+                    print("LOSS: ",loss,"BestLoss: ",BestLoss)
+                    if loss<BestLoss:
+                        #self.drawImage(SHIFT_X,SHIFT_Y)
+                        BestLoss = loss
+                        self.BestX = SHIFT_X
+                        self.BestY = SHIFT_Y
+                        self.Best_Rotate = degree
+                    SHIFT_Y+=1
+                SHIFT_Y = 1
+                SHIFT_X+=1
+            SHIFT_X = 1
+            canvas = self.rotateImage(degree)
 
 

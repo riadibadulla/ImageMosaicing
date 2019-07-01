@@ -6,13 +6,13 @@ from ImageStitcher import ImageStitcher
 class main:
 
     def mosaic2Images(img1,img2):
-        mosaic = ImageStitcher(img1,img2,False)
+        mosaic = ImageStitcher(img1.copy(),img2.copy(),False)
         mosaic.mosaicImages()
         mosaic.drawImage(mosaic.BestX,mosaic.BestY)
 
     if __name__=='__main__':
         START_TIME = time.time()
-        img1 = cv2.imread('/cs/home/ri31/project-scripts/images/Map1.png')
+        img1 = cv2.imread('/cs/home/ri31/project-scripts/images/Map1Rotate.png')
         img2 = cv2.imread('/cs/home/ri31/project-scripts/images/Map2.png')  
         mosaic2Images(img1,img2)
         END_TIME = time.time()
