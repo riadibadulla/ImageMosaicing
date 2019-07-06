@@ -6,7 +6,7 @@ from ImageStitcher import ImageStitcher
 class main:
 
     def mosaic2Images(img1,img2):
-        mosaic = ImageStitcher(img1,img2,False)
+        mosaic = ImageStitcher(img1.copy(),img2.copy(),False)
         mosaic.mosaicImages()
         mosaic.drawImage(mosaic.BestX,mosaic.BestY)
 

@@ -3,6 +3,7 @@ import numpy as np
 import time 
 from scipy.optimize import minimize
 import random
+import math
 
 class ImageStitcher:
     img1 = None
@@ -10,6 +11,7 @@ class ImageStitcher:
     h1,h2,w1,w2 = 0,0,0,0
     BestX = 1
     BestY = 1
+    Best_Rotate = 1
 
     def __init__(self, img1, img2, resize):
         self.img1 = img1
@@ -65,6 +67,18 @@ class ImageStitcher:
         cv2.imshow('image',vis)
         cv2.waitKey(500)
 
+    def rotateImage(self,angleInDegrees):
+        thetha = angleInDegrees * math.pi/180
+        a = math.cos(thetha)
+        b = math.sin(thetha)
+        canvas = np.zeros((self.h1*2+self.h2,self.w1*2+self.w2,3), dtype=np.uint8)
+        canvas[self.h1:self.h2+self.h1, self.w1:self.w1+self.w2,:3] = self.img2
+        h, w = canvas.shape[:2]
+        M = np.float32([[a,b,(1-a)*w/2-b*h/2],[-b,a,b*w/2+(1-a)*h/2],[0,0,1]])
+        canvas = cv2.warpPerspective(canvas,M,(w,h))
+        canvas[:self.h1,:self.w1,:3] = self.img1
+        return canvas
+
 
     def mosaicImages(self):
         savedParameters = [[],[]]
@@ -87,8 +101,3 @@ class ImageStitcher:
         print(savedParameters[1][minimumErrorIndex][0]*(self.w1+self.w2))
         print(savedParameters[1][minimumErrorIndex][1]*(self.w1+self.w2))
         self.BestX, self.BestY = int(savedParameters[1][minimumErrorIndex][0]*(self.w1+self.w2)),int(savedParameters[1][minimumErrorIndex][1]*(self.h1+self.h2))
-        
-
-        
-
-
