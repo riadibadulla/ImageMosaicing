@@ -2,6 +2,9 @@ import cv2
 import numpy as np
 import time 
 import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
+from matplotlib import cm
+
 class ImageStitcher:
     img1 = None
     img2 = None
@@ -85,15 +88,24 @@ class ImageStitcher:
                 SHIFT_Y+=1
             SHIFT_Y = 1
             SHIFT_X+=1
-        plt.imshow(loss_space,cmap='hot',interpolation='nearest')
-        plt.show()
-        # hf = plt.figure()
-        # ha = hf.add_subplot(111, projection='3d')
-
-        # X, Y = np.meshgrid(range(len(loss_space)), range(len(loss_space[0])))  # `plot_surface` expects `x` and `y` data to be 2D
-        # ha.plot_surface(X, Y, loss_space)
-
+        # plt.imshow(loss_space,cmap='hot',interpolation='nearest')
         # plt.show()
+
+        print(self.BestX,"   ",self.BestY)
+
+        nx, ny = len(loss_space[0]), len(loss_space)
+        x = range(nx)
+        y = range(ny)
+
+        data = np.array(loss_space)
+
+        hf = plt.figure()
+        ha = hf.add_subplot(111, projection='3d')
+
+        X, Y = np.meshgrid(x, y)  # `plot_surface` expects `x` and `y` data to be 2D
+        ha.plot_surface(X, Y, data, cmap=cm.coolwarm)
+
+        plt.show()
 
 
 
