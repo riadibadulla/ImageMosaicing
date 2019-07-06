@@ -2,6 +2,7 @@ import cv2
 import numpy as np
 import time 
 from scipy.optimize import minimize
+import random
 
 class ImageStitcher:
     img1 = None
@@ -18,6 +19,7 @@ class ImageStitcher:
             self.img2 = cv2.resize(self.img2,None,fx=0.1,fy=0.1)
         self.h1, self.w1 = self.img1.shape[:2]
         self.h2, self.w2 = self.img2.shape[:2]
+        print("H1: ",self.h1,"  W1: ",self.w1,"\nH2: ",self.h2,"  W2: ",self.w2)
         
 
     def getIntersectionCoordinates(self,h1,w1,h2,w2,SHIFT_X,SHIFT_Y):
@@ -42,6 +44,9 @@ class ImageStitcher:
     def calculateLoss(self,SHIFT):
         SHIFT_X,SHIFT_Y = SHIFT
         SHIFT_X, SHIFT_Y = int(SHIFT_X*(self.w1+self.w2)),int(SHIFT_Y*(self.h1+self.h2))
+        print("SHIFT_X: ",SHIFT_X,"    SHIFT_Y: ",SHIFT_Y)
+        if (SHIFT_X>=self.w1+self.w2 or SHIFT_Y>=self.h1+self.h2 or SHIFT_Y<1 or SHIFT_X<1):
+            return 255*3*self.w1*self.h1*self.h2*self.w2
         canvas = np.zeros((self.h1*2+self.h2,self.w1*2+self.w2,3), dtype=np.uint8)
         canvas[:self.h1,:self.w1,:3] = self.img1
         canvas[self.h1:self.h2+self.h1, self.w1:self.w1+self.w2,:3] = self.img2
@@ -62,13 +67,26 @@ class ImageStitcher:
 
 
     def mosaicImages(self):
+        savedParameters = [[],[]]
         SHIFT_X = 1
         SHIFT_Y = 1
-        x0 = [0.5,0.5]
-        bnds = ((0,1),(0,1))
-        res = minimize(self.calculateLoss,x0, method = 'nelder-mead',bounds = bnds, options={'disp':True})
-        print(res.x)
-        self.BestX, self.BestY = int(res.x[0]*(self.w1+self.w2)),int(res.x[1]*(self.w1+self.w2))
+        for i in range(100):
+            x = random.uniform(0,1)
+            y = random.uniform(0,1)
+            print("Initial Values: ",x,"  ",y)
+            x0 = [x,y]
+            res = minimize(self.calculateLoss,x0, method = 'nelder-mead', options={'disp':True})
+            savedParameters[0].append(res.fun)
+            savedParameters[1].append(res.x)
+            print("\n\n\n\n")
+        
+        minimumErrorIndex = savedParameters[0].index(min(savedParameters[0]))
+        print("\n\n\n\n\n\n")
+        print(minimumErrorIndex)
+        print(savedParameters[0][minimumErrorIndex])
+        print(savedParameters[1][minimumErrorIndex][0]*(self.w1+self.w2))
+        print(savedParameters[1][minimumErrorIndex][1]*(self.w1+self.w2))
+        self.BestX, self.BestY = int(savedParameters[1][minimumErrorIndex][0]*(self.w1+self.w2)),int(savedParameters[1][minimumErrorIndex][1]*(self.h1+self.h2))
         
 
         
