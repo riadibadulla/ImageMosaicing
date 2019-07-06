@@ -7,7 +7,7 @@ class main:
 
     def mosaic2Images(img1,img2):
         mosaic = ImageStitcher(img1.copy(),img2.copy(),False)
-        mosaic.mosaicImages()
+        mosaic.mosaicImages(10)
         mosaic.drawImage(mosaic.BestX,mosaic.BestY)
 
     if __name__=='__main__':

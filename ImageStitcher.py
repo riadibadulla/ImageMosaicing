@@ -80,13 +80,15 @@ class ImageStitcher:
         return canvas
 
 
-    def mosaicImages(self):
+    def mosaicImages(self,n):
         savedParameters = [[],[]]
         SHIFT_X = 1
         SHIFT_Y = 1
-        for i in range(100):
-            x = random.uniform(0,1)
-            y = random.uniform(0,1)
+        intitial_cors_x = np.linspace(0.1,1,n,False)
+        intitial_cors_y = np.linspace(0.1,1,n,False)
+        for i in range(n*n):
+            x = intitial_cors_x[i%n]
+            y = intitial_cors_y[int(i/n)]
             print("Initial Values: ",x,"  ",y)
             x0 = [x,y]
             res = minimize(self.calculateLoss,x0, method = 'nelder-mead', options={'disp':True})
