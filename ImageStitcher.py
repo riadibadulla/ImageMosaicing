@@ -22,7 +22,7 @@ class ImageStitcher:
             self.img2 = cv2.resize(self.img2,None,fx=0.1,fy=0.1)
         self.h1, self.w1 = self.img1.shape[:2]
         self.h2, self.w2 = self.img2.shape[:2]
-        self.img2_canvas_size = math.sqrt(math.pow(h2,2)+math.pow(w2,2))
+        self.img2_canvas_size = int(math.sqrt(math.pow(self.h2,2)+math.pow(self.w2,2)))
 
         print("H1: ",self.h1,"  W1: ",self.w1,"\nH2: ",self.h2,"  W2: ",self.w2)
         
@@ -50,36 +50,36 @@ class ImageStitcher:
         SHIFT_X,SHIFT_Y, thetha = SHIFT
         SHIFT_X, SHIFT_Y, thetha = int(SHIFT_X*(self.w1+self.w2)),int(SHIFT_Y*(self.h1+self.h2)),int(thetha*360)
         print("SHIFT_X: ",SHIFT_X,"    SHIFT_Y: ",SHIFT_Y,"    Angle: ",thetha)
-        #self.drawImage(SHIFT_X,SHIFT_Y)
-        if (SHIFT_X>=self.w1+self.w2 or SHIFT_Y>=self.h1+self.h2 or SHIFT_Y<1 or SHIFT_X<1):
+        # self.drawImage(SHIFT_X,SHIFT_Y)
+        if (SHIFT_X>=self.w1+self.img2_canvas_size or SHIFT_Y>=self.h1+self.img2_canvas_size or SHIFT_Y<1 or SHIFT_X<1):
             return 255*3*self.w1*self.h1*self.h2*self.w2
-        
         canvas = self.rotateImage(thetha)
         canvas[:self.h1,:self.w1,:3] = self.img1
-
         # cv2.imshow('image',canvas)
         # cv2.waitKey(500)
-
-        coor = self.getIntersectionCoordinates(self.h1,self.w1,self.h2,self.w2,SHIFT_X,SHIFT_Y)
+        coor = self.getIntersectionCoordinates(self.h1,self.w1,self.img2_canvas_size,self.img2_canvas_size,SHIFT_X,SHIFT_Y)
         image1 = canvas[coor['y6']-SHIFT_Y:coor['y5']-SHIFT_Y,coor['x5']-SHIFT_X:coor['x6']-SHIFT_X,:3]
         image2 = canvas[coor['y6']:coor['y5'],coor['x5']:coor['x6'],:3]
         loss = np.mean(np.absolute(np.subtract(image1,image2)))
+        if (loss==0):
+            return 255*3*self.w1*self.h1*self.h2*self.w2
         return loss
 
-    def drawImage(self,X,Y):
-        vis = np.zeros((self.h1*2+self.h2,self.w1*2+self.w2,3), dtype=np.uint8)
+    def drawImage(self,X,Y, thetha,time):
+        vis = self.rotateImage(thetha)
         vis[Y:self.h1+Y,X:self.w1+X,:3] = self.img1
-        vis[self.h1:self.h2+self.h1, self.w1:self.w1+self.w2,:3] = self.img2
         cv2.imwrite("output.jpg",vis)
         cv2.imshow('image',vis)
-        cv2.waitKey(500)
+        cv2.waitKey(time)
 
     def rotateImage(self,angleInDegrees):
         thetha = angleInDegrees * math.pi/180
         a = math.cos(thetha)
         b = math.sin(thetha)
-        canvas = np.zeros((self.h1*2+self.h2,self.w1*2+self.w2,3), dtype=np.uint8)
-        canvas[self.h1:self.h2+self.h1, self.w1:self.w1+self.w2,:3] = self.img2
+        canvas = np.zeros((self.h1*2+self.img2_canvas_size,self.w1*2+self.img2_canvas_size,3), dtype=np.uint8)
+        canvas[self.h1+int((self.img2_canvas_size-self.h2)/2):self.h2+self.h1+int((self.img2_canvas_size-self.h2)/2), 
+        self.w1+int((self.img2_canvas_size-self.w2)/2):self.w1+self.w2+int((self.img2_canvas_size-self.w2)/2),
+        :3] = self.img2
         h, w = canvas.shape[:2]
         M = np.float32([[a,b,(1-a)*w/2-b*h/2],[-b,a,b*w/2+(1-a)*h/2],[0,0,1]])
         canvas = cv2.warpPerspective(canvas,M,(w,h))
@@ -92,16 +92,18 @@ class ImageStitcher:
         intitial_cors_x = np.linspace(0.1,1,n,False)
         intitial_cors_y = np.linspace(0.1,1,n,False)
         initial_param_thetha = np.linspace(0,1,n,False)
-        for i in range(n*n*n):
-            thetha = initial_param_thetha[int(i/n)]
-            x = intitial_cors_x[i%n%n]
-            y = intitial_cors_y[int(i%n/n)]
-            print("Initial Values: ",x,"  ",y)
-            x0 = [x,y,thetha]
-            res = minimize(self.calculateLoss,x0, method = 'nelder-mead', options={'disp':True})
-            savedParameters[0].append(res.fun)
-            savedParameters[1].append(res.x)
-            print("\n\n\n\n")
+        for i in range(n):
+            thetha = initial_param_thetha[i]
+            for j in range(n):
+                x = intitial_cors_x[j]
+                for k in range(n):
+                    y = intitial_cors_y[k]
+                    print("Initial Values: ",x,"  ",y)
+                    x0 = [x,y,thetha]
+                    res = minimize(self.calculateLoss,x0, method = 'nelder-mead', options={'disp':True})
+                    savedParameters[0].append(res.fun)
+                    savedParameters[1].append(res.x)
+                    print("\n\n\n\n")
         
         minimumErrorIndex = savedParameters[0].index(min(savedParameters[0]))
         print("\n\n\n\n\n\n")
@@ -110,4 +112,6 @@ class ImageStitcher:
         print(savedParameters[1][minimumErrorIndex][0]*(self.w1+self.w2))
         print(savedParameters[1][minimumErrorIndex][1]*(self.w1+self.w2))
         print(savedParameters[1][minimumErrorIndex][2]*360)
-        self.BestX, self.BestY = int(savedParameters[1][minimumErrorIndex][0]*(self.w1+self.w2)),int(savedParameters[1][minimumErrorIndex][1]*(self.h1+self.h2))
+        self.BestX = int(savedParameters[1][minimumErrorIndex][0]*(self.w1+self.w2))
+        self.BestY = int(savedParameters[1][minimumErrorIndex][1]*(self.h1+self.h2))
+        self.Best_Rotate = int(savedParameters[1][minimumErrorIndex][2]*360)
