@@ -8,6 +8,7 @@ import math
 class ImageStitcher:
     img1 = None
     img2 = None
+    img2_canvas_size = None
     h1,h2,w1,w2 = 0,0,0,0
     BestX = 1
     BestY = 1
@@ -21,6 +22,7 @@ class ImageStitcher:
             self.img2 = cv2.resize(self.img2,None,fx=0.1,fy=0.1)
         self.h1, self.w1 = self.img1.shape[:2]
         self.h2, self.w2 = self.img2.shape[:2]
+        self.img2_canvas_size = math.sqrt(math.pow(h2,2)+math.pow(w2,2))
 
         print("H1: ",self.h1,"  W1: ",self.w1,"\nH2: ",self.h2,"  W2: ",self.w2)
         
