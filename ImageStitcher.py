@@ -50,19 +50,17 @@ class ImageStitcher:
         SHIFT_X,SHIFT_Y, thetha = SHIFT
         SHIFT_X, SHIFT_Y, thetha = int(SHIFT_X*(self.w1+self.w2)),int(SHIFT_Y*(self.h1+self.h2)),int(thetha*360)
         print("SHIFT_X: ",SHIFT_X,"    SHIFT_Y: ",SHIFT_Y,"    Angle: ",thetha)
-        # self.drawImage(SHIFT_X,SHIFT_Y)
         if (SHIFT_X>=self.w1+self.img2_canvas_size or SHIFT_Y>=self.h1+self.img2_canvas_size or SHIFT_Y<1 or SHIFT_X<1):
             return 255*3*self.w1*self.h1*self.h2*self.w2
         canvas = self.rotateImage(thetha)
         canvas[:self.h1,:self.w1,:3] = self.img1
-        # cv2.imshow('image',canvas)
-        # cv2.waitKey(500)
+        # self.drawImage(SHIFT_X,SHIFT_Y,thetha,10)
         coor = self.getIntersectionCoordinates(self.h1,self.w1,self.img2_canvas_size,self.img2_canvas_size,SHIFT_X,SHIFT_Y)
         image1 = canvas[coor['y6']-SHIFT_Y:coor['y5']-SHIFT_Y,coor['x5']-SHIFT_X:coor['x6']-SHIFT_X,:3]
         image2 = canvas[coor['y6']:coor['y5'],coor['x5']:coor['x6'],:3]
-        loss = np.mean(np.absolute(np.subtract(image1,image2)))
-        if (loss==0):
+        if np.sum(image2)==0:
             return 255*3*self.w1*self.h1*self.h2*self.w2
+        loss = np.mean(np.absolute(np.subtract(image1,image2)))
         return loss
 
     def drawImage(self,X,Y, thetha,time):
@@ -102,6 +100,7 @@ class ImageStitcher:
                     x0 = [x,y,thetha]
                     res = minimize(self.calculateLoss,x0, method = 'nelder-mead', options={'disp':True})
                     savedParameters[0].append(res.fun)
+                    print(res.fun)
                     savedParameters[1].append(res.x)
                     print("\n\n\n\n")
         
