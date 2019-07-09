@@ -50,7 +50,7 @@ class ImageStitcher:
         SHIFT_X,SHIFT_Y, thetha = SHIFT
         SHIFT_X, SHIFT_Y, thetha = int(SHIFT_X*(self.w1+self.w2)),int(SHIFT_Y*(self.h1+self.h2)),int(thetha*360)
         print("SHIFT_X: ",SHIFT_X,"    SHIFT_Y: ",SHIFT_Y,"    Angle: ",thetha)
-        if (SHIFT_X>=self.w1+self.img2_canvas_size or SHIFT_Y>=self.h1+self.img2_canvas_size or SHIFT_Y<1 or SHIFT_X<1):
+        if (SHIFT_X>=self.w1+self.img2_canvas_size-self.img2_canvas_size*0.05 or SHIFT_Y>=self.h1+self.img2_canvas_size-self.img2_canvas_size*0.05 or SHIFT_Y<self.img2_canvas_size*0.05 or SHIFT_X<self.img2_canvas_size*0.05):
             return 255*3*self.w1*self.h1*self.h2*self.w2
         canvas = self.rotateImage(thetha)
         canvas[:self.h1,:self.w1,:3] = self.img1
@@ -60,7 +60,8 @@ class ImageStitcher:
         image2 = canvas[coor['y6']:coor['y5'],coor['x5']:coor['x6'],:3]
         if np.sum(image2)==0:
             return 255*3*self.w1*self.h1*self.h2*self.w2
-        loss = np.mean(np.absolute(np.subtract(image1,image2)))
+        difference = np.square(np.subtract(image1[np.nonzero(image2)],image2[np.nonzero(image2)]))
+        loss = np.mean(difference)
         return loss
 
     def drawImage(self,X,Y, thetha,time):
@@ -105,6 +106,8 @@ class ImageStitcher:
                     print("\n\n\n\n")
         
         minimumErrorIndex = savedParameters[0].index(min(savedParameters[0]))
+        print("\n\n\n\n\n\n")
+        print(savedParameters)
         print("\n\n\n\n\n\n")
         print(minimumErrorIndex)
         print(savedParameters[0][minimumErrorIndex])
