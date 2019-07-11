@@ -26,6 +26,14 @@ class ImageStitcher:
 
         print("H1: ",self.h1,"  W1: ",self.w1,"\nH2: ",self.h2,"  W2: ",self.w2)
         
+    def rotateTranslateCoordinates(self, X,Y,centreX,centreY):
+        tempX = X - centreX
+        tempY = Y - centreY
+        rotatedX = tempX*math.cos(45 * math.pi/180) - tempY*math.sin(45 * math.pi/180)
+        rotatedY = tempX*math.sin(45 * math.pi/180) + tempY*math.cos(45 * math.pi/180)
+        x = rotatedX + centreX
+        y = rotatedY + centreY
+        return x,y
 
     def getIntersectionCoordinates(self,h1,w1,h2,w2,SHIFT_X,SHIFT_Y):
         x1 = w1
