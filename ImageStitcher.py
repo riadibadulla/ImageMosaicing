@@ -54,12 +54,26 @@ class ImageStitcher:
         #     return
         return {'x5':x5,'y5':y5,'x6':x6,'y6':y6}
 
+    def getCornersOfImages(self,SHIFT):
+        y_OffsetIMG2 = int((self.img2_canvas_size-self.h2)/2)
+        x_OffsetIMG2 = int((self.img2_canvas_size-self.w2)/2)
+        SHIFT_X,SHIFT_Y, thetha = SHIFT
+        rectangle1 = []
+        rectangle2 = []
+        rectangle1.append((SHIFT_X,SHIFT_Y),(SHIFT_X,self.h1+SHIFT_Y),(self.w1+SHIFT_X,self.h1+SHIFT_Y),(self.w1+SHIFT_X,SHIFT_Y))
+        rectangle2.append((self.w1+x_OffsetIMG2,self.h1+x_OffsetIMG2),(self.w1+x_OffsetIMG2,self.h1+x_OffsetIMG2+self.h2),
+        (self.w1+x_OffsetIMG2+self.w2,self.h1+x_OffsetIMG2),(self.w1+x_OffsetIMG2+self.w2,self.h1+x_OffsetIMG2+self.h2))
+        return rectangle1,rectangle2
+
     def calculateLoss(self,SHIFT):
         SHIFT_X,SHIFT_Y, thetha = SHIFT
         SHIFT_X, SHIFT_Y, thetha = int(SHIFT_X*(self.w1+self.w2)),int(SHIFT_Y*(self.h1+self.h2)),int(thetha*360)
         print("SHIFT_X: ",SHIFT_X,"    SHIFT_Y: ",SHIFT_Y,"    Angle: ",thetha)
         if (SHIFT_X>=self.w1+self.img2_canvas_size-self.img2_canvas_size*0.05 or SHIFT_Y>=self.h1+self.img2_canvas_size-self.img2_canvas_size*0.05 or SHIFT_Y<self.img2_canvas_size*0.05 or SHIFT_X<self.img2_canvas_size*0.05):
             return 255*3*self.w1*self.h1*self.h2*self.w2
+        
+        #TODO: Get corners Of Image
+
         canvas = self.rotateImage(thetha)
         canvas[:self.h1,:self.w1,:3] = self.img1
         # self.drawImage(SHIFT_X,SHIFT_Y,thetha,10)
