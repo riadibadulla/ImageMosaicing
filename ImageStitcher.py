@@ -14,6 +14,7 @@ class ImageStitcher:
     BestX = 1
     BestY = 1
     Best_Rotate = 1
+    canvas = None
 
     def __init__(self, img1, img2, resize):
         self.img1 = img1
@@ -27,43 +28,13 @@ class ImageStitcher:
 
         print("H1: ",self.h1,"  W1: ",self.w1,"\nH2: ",self.h2,"  W2: ",self.w2)
         
-    def rotateTranslateCoordinates(self, X,Y,centreX,centreY):
-        tempX = X - centreX
-        tempY = Y - centreY
-        rotatedX = tempX*math.cos(45 * math.pi/180) - tempY*math.sin(45 * math.pi/180)
-        rotatedY = tempX*math.sin(45 * math.pi/180) + tempY*math.cos(45 * math.pi/180)
-        x = rotatedX + centreX
-        y = rotatedY + centreY
-        return x,y
-
-    def getIntersectionCoordinates(self,h1,w1,h2,w2,SHIFT_X,SHIFT_Y):
-        x1 = w1
-        x2 = w1+w2
-        y1 = h1+h2
-        y2 = h1
-        x3=SHIFT_X
-        y3=SHIFT_Y+h1
-        x4 = SHIFT_X+w1
-        y4=SHIFT_Y
-
-        x5 = max(x1, x3) 
-        y5 = min(y1, y3) 
-        x6 = min(x2, x4) 
-        y6 = max(y2, y4) 
-        # if (x5 > x6 or y5 > y6) : 
-        #     print("No intersection") 
-        #     return
-        return {'x5':x5,'y5':y5,'x6':x6,'y6':y6}
-
     def getCornersOfImages(self,SHIFT):
         y_OffsetIMG2 = int((self.img2_canvas_size-self.h2)/2)
         x_OffsetIMG2 = int((self.img2_canvas_size-self.w2)/2)
         SHIFT_X,SHIFT_Y, thetha = SHIFT
-        rectangle1 = []
-        rectangle2 = []
-        rectangle1.append((SHIFT_X,SHIFT_Y),(SHIFT_X,self.h1+SHIFT_Y),(self.w1+SHIFT_X,self.h1+SHIFT_Y),(self.w1+SHIFT_X,SHIFT_Y))
-        rectangle2.append((self.w1+x_OffsetIMG2,self.h1+x_OffsetIMG2),(self.w1+x_OffsetIMG2,self.h1+x_OffsetIMG2+self.h2),
-        (self.w1+x_OffsetIMG2+self.w2,self.h1+x_OffsetIMG2),(self.w1+x_OffsetIMG2+self.w2,self.h1+x_OffsetIMG2+self.h2))
+        rectangle1 = [(SHIFT_X,SHIFT_Y),(SHIFT_X,self.h1+SHIFT_Y),(self.w1+SHIFT_X,self.h1+SHIFT_Y),(self.w1+SHIFT_X,SHIFT_Y)]
+        rectangle2 = [(self.w1+x_OffsetIMG2,self.h1+x_OffsetIMG2),(self.w1+x_OffsetIMG2,self.h1+x_OffsetIMG2+self.h2),
+        (self.w1+x_OffsetIMG2+self.w2,self.h1+x_OffsetIMG2),(self.w1+x_OffsetIMG2+self.w2,self.h1+x_OffsetIMG2+self.h2)]
         return rectangle1,rectangle2
 
     def calculateLoss(self,SHIFT):
@@ -72,20 +43,15 @@ class ImageStitcher:
         print("SHIFT_X: ",SHIFT_X,"    SHIFT_Y: ",SHIFT_Y,"    Angle: ",thetha)
         if (SHIFT_X>=self.w1+self.img2_canvas_size-self.img2_canvas_size*0.05 or SHIFT_Y>=self.h1+self.img2_canvas_size-self.img2_canvas_size*0.05 or SHIFT_Y<self.img2_canvas_size*0.05 or SHIFT_X<self.img2_canvas_size*0.05):
             return 255*3*self.w1*self.h1*self.h2*self.w2
-        coor_system = CoordinateSystem(getCornersOfImages(SHIFT))
-        #coor_system.rotateCornersOfImage2(thetha)
-        #TODO: coordinates_of_intersection = coor_system.get_indecies_on_rotate(thetha)
+        coor_system = CoordinateSystem(self.getCornersOfImages(SHIFT))
+        coordinates_of_intersection = coor_system.get_indecies_on_rotate(SHIFT_X, SHIFT_Y,thetha)
 
+        image1 = self.canvas[:self.h1,:self.w1,:3]
+        image2 = self.canvas[self.h1+int((self.img2_canvas_size-self.h2)/2):self.h2+self.h1+int((self.img2_canvas_size-self.h2)/2), 
+        self.w1+int((self.img2_canvas_size-self.w2)/2):self.w1+self.w2+int((self.img2_canvas_size-self.w2)/2),
+        :3]
 
-        canvas = self.rotateImage(thetha)
-        canvas[:self.h1,:self.w1,:3] = self.img1
-        # self.drawImage(SHIFT_X,SHIFT_Y,thetha,10)
-        coor = self.getIntersectionCoordinates(self.h1,self.w1,self.img2_canvas_size,self.img2_canvas_size,SHIFT_X,SHIFT_Y)
-        image1 = canvas[coor['y6']-SHIFT_Y:coor['y5']-SHIFT_Y,coor['x5']-SHIFT_X:coor['x6']-SHIFT_X,:3]
-        image2 = canvas[coor['y6']:coor['y5'],coor['x5']:coor['x6'],:3]
-        if np.sum(image2)==0:
-            return 255*3*self.w1*self.h1*self.h2*self.w2
-        difference = np.square(np.subtract(image1[np.nonzero(image2)],image2[np.nonzero(image2)]))
+        difference = np.square(np.subtract(image1[coordinates_of_intersection[0]],image2[coordinates_of_intersection[1]]))
         loss = np.mean(difference)
         return loss
 
@@ -112,6 +78,12 @@ class ImageStitcher:
 
 
     def mosaicImages(self,n):
+        self.canvas = np.zeros((self.h1*2+self.img2_canvas_size,self.w1*2+self.img2_canvas_size,3), dtype=np.uint8)
+        self.canvas[self.h1+int((self.img2_canvas_size-self.h2)/2):self.h2+self.h1+int((self.img2_canvas_size-self.h2)/2), 
+        self.w1+int((self.img2_canvas_size-self.w2)/2):self.w1+self.w2+int((self.img2_canvas_size-self.w2)/2),
+        :3] = self.img2
+        self.canvas[:self.h1,:self.w1,:3] = self.img1
+
         savedParameters = [[],[]]
         intitial_cors_x = np.linspace(0.1,1,n,False)
         intitial_cors_y = np.linspace(0.1,1,n,False)
