@@ -73,7 +73,8 @@ class ImageStitcher:
         if (SHIFT_X>=self.w1+self.img2_canvas_size-self.img2_canvas_size*0.05 or SHIFT_Y>=self.h1+self.img2_canvas_size-self.img2_canvas_size*0.05 or SHIFT_Y<self.img2_canvas_size*0.05 or SHIFT_X<self.img2_canvas_size*0.05):
             return 255*3*self.w1*self.h1*self.h2*self.w2
         coor_system = CoordinateSystem(getCornersOfImages(SHIFT))
-        
+        #coor_system.rotateCornersOfImage2(thetha)
+        #TODO: coordinates_of_intersection = coor_system.get_indecies_on_rotate(thetha)
 
 
         canvas = self.rotateImage(thetha)
