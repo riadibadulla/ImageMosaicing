@@ -4,6 +4,7 @@ import time
 from scipy.optimize import minimize
 import random
 import math
+from CoordinateSystem import CoordinateSystem
 
 class ImageStitcher:
     img1 = None
@@ -71,8 +72,9 @@ class ImageStitcher:
         print("SHIFT_X: ",SHIFT_X,"    SHIFT_Y: ",SHIFT_Y,"    Angle: ",thetha)
         if (SHIFT_X>=self.w1+self.img2_canvas_size-self.img2_canvas_size*0.05 or SHIFT_Y>=self.h1+self.img2_canvas_size-self.img2_canvas_size*0.05 or SHIFT_Y<self.img2_canvas_size*0.05 or SHIFT_X<self.img2_canvas_size*0.05):
             return 255*3*self.w1*self.h1*self.h2*self.w2
+        coor_system = CoordinateSystem(getCornersOfImages(SHIFT))
         
-        #TODO: Get corners Of Image
+
 
         canvas = self.rotateImage(thetha)
         canvas[:self.h1,:self.w1,:3] = self.img1

@@ -12,8 +12,8 @@ class main:
 
     if __name__=='__main__':
         START_TIME = time.time()
-        img1 = cv2.imread('/cs/home/ri31/project-scripts/images/Map1-rotate.png')
-        img2 = cv2.imread('/cs/home/ri31/project-scripts/images/Map2.png')  
+        img1 = cv2.imread('images/Map1-rotate.png')
+        img2 = cv2.imread('images/Map2.png')  
         mosaic2Images(img1,img2)
         END_TIME = time.time()
         print("Time taken: ", format(END_TIME - START_TIME), " seconds")
