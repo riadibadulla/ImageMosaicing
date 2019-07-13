@@ -7,8 +7,8 @@ class main:
 
     def mosaic2Images(img1,img2):
         mosaic = ImageStitcher(img1.copy(),img2.copy(),False)
-        mosaic.mosaicImages(5)
-        mosaic.drawImage(mosaic.BestX,mosaic.BestY,mosaic.Best_Rotate,1)
+        mosaic.mosaicImages(2)
+        mosaic.drawImage(mosaic.BestX,mosaic.BestY,mosaic.Best_Rotate,0)
 
     if __name__=='__main__':
         START_TIME = time.time()
