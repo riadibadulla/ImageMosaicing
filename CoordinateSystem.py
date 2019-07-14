@@ -58,7 +58,7 @@ class CoordinateSystem:
         bounds = polygon.bounds
         for y in range(int(bounds[1]),int(bounds[3]-1)):
             for x in range(int(bounds[0]),int(bounds[2]-1)):
-                if (polygon.within(Point(x,y))):
+                if (Point(x,y).within(polygon)):
                     coordinatesInPolygon.append((x,y))
         return np.array(LineString(coordinatesInPolygon).xy)
 
