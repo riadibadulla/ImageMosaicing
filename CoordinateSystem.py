@@ -58,10 +58,36 @@ class CoordinateSystem:
         bounds = polygon.bounds
         for y in range(int(bounds[1]),int(bounds[3]-1)):
             for x in range(int(bounds[0]),int(bounds[2]-1)):
-                if (polygon.contains(Point(x,y))):
+                if (polygon.within(Point(x,y))):
                     coordinatesInPolygon.append((x,y))
         return np.array(LineString(coordinatesInPolygon).xy)
+
+    # def get_coordinates_in_polygon(self,geom):
+    #     exterior_coords = geom.exterior.coords[:]
+    #     interior_coords = []
+    #     for interior in geom.interiors:
+    #         interior_coords += interior.coords[:]
+    #     return interior_coords
+
+    def make_image_format_indexing(self,coordintes):
+        new_format = np.repeat(coordintes,3,1)
+        new_format = np.append(new_format,np.array([np.tile(np.array([0,1,2]),int(len(coordintes[0])))]),axis=0)
+        return new_format.astype(int)
+    
+    def get_indecies_on_rotate(self, SHIFT_X, SHIFT_Y, thetha):
+        if (thetha != 0):
+            self.rotateCornersOfImage2(thetha)
+        intersection = self.get_intersection_polygon()
+        if (intersection.area == 0.0):
+            return -1
+        initialPolygon2 = self.rotateElement(intersection,-1*thetha)
+        coordinates_in_polygon1 = self.get_coordinates_in_polygon(intersection)
+        coordinates_in_polygon1 = self.make_image_format_indexing(coordinates_in_polygon1)
+        coordinates_in_polygon2 = self.get_coordinates_in_polygon(initialPolygon2)
+        coordinates_in_polygon2 = self.make_image_format_indexing(coordinates_in_polygon2)
         
+        return (coordinates_in_polygon1, coordinates_in_polygon2)
+    
     # def getCoorOfIntersectionInInitImg2(self,coordinatesInPolygon,centreOfRectangle,angle):
     #     listOfInitialCoor = []
     #     for coor in coordinatesInPolygon:
@@ -85,22 +111,3 @@ class CoordinateSystem:
     #             values[2].append(i)
     #     values = np.array(values)
     #     return values
-
-    def make_image_format_indexing(self,coordintes):
-        new_format = np.repeat(coordintes,3,1)
-        new_format = np.append(new_format,np.array([np.tile(np.array([0,1,2]),int(len(coordintes[0])))]),axis=0)
-        return new_format.astype(int)
-    
-    def get_indecies_on_rotate(self, SHIFT_X, SHIFT_Y, thetha):
-        if (thetha != 0):
-            self.rotateCornersOfImage2(thetha)
-        intersection = self.get_intersection_polygon()
-        if (intersection.area == 0.0):
-            return -1
-        initialPolygon2 = self.rotateElement(intersection,-1*thetha)
-        coordinates_in_polygon1 = self.get_coordinates_in_polygon(intersection)
-        coordinates_in_polygon1 = self.make_image_format_indexing(coordinates_in_polygon1)
-        coordinates_in_polygon2 = self.get_coordinates_in_polygon(initialPolygon2)
-        coordinates_in_polygon2 = self.make_image_format_indexing(coordinates_in_polygon2)
-        
-        return (coordinates_in_polygon1, coordinates_in_polygon2)
