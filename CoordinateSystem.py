@@ -19,7 +19,7 @@ class CoordinateSystem:
         self.rectangle1, self.rectangle2 = rectangles
 
     def rotateElement(self,geometricFigure, thetha):
-        Start = time.time()
+        # Start = time.time()
         a = math.cos(thetha)
         b = math.sin(thetha)
         centrex = self.centreOfRectangle2[0]
@@ -27,8 +27,8 @@ class CoordinateSystem:
         #M = [[a,b,(1-a)*centrex*centrey],[-b,a,b*centrex+(1-a)*centrey],[0,0,1]]
         M = [a,b,-b,a,(1-a)*centrex-b*centrey,b*centrex+(1-a)*centrey]
         rotated = affine_transform(geometricFigure,M)
-        end = time.time()
-        print("Rotate line: ",end-Start,"\n\n" )
+        # end = time.time()
+        # print("Rotate line: ",end-Start,"\n\n" )
         return rotated
 
     def rotateTranslateCoordinates(self,coor,centreX,centreY,angle):
@@ -42,26 +42,26 @@ class CoordinateSystem:
         return x,y
 
     def rotateCornersOfImage2(self,angle):
-        Start = time.time()
+        # Start = time.time()
         newRectangle = []
         for coor in self.rectangle2:
             newCorner = self.rotateTranslateCoordinates(coor,self.centreOfRectangle2[0],self.centreOfRectangle2[1],angle)
             newRectangle.append(newCorner)
         self.rectangle2 = newRectangle
-        end = time.time()
-        print("rotate corners: ",end-Start,"\n\n" )
+        # end = time.time()
+        # print("rotate corners: ",end-Start,"\n\n" )
     
     def get_intersection_polygon(self):
-        Start = time.time()
+        # Start = time.time()
         p1 = Polygon(self.rectangle1)
         p2 = Polygon(self.rectangle2)
         intersection = p1.intersection(p2)
-        end = time.time()
-        print("get intersection: ",end-Start ,"\n\n")
+        # end = time.time()
+        # print("get intersection: ",end-Start ,"\n\n")
         return intersection
 
     def get_coordinates_in_polygon(self, polygon):
-        Start = time.time()
+        # Start = time.time()
         if (polygon.area == 0.0):
             return []
         coordinatesInPolygon = []
@@ -73,17 +73,17 @@ class CoordinateSystem:
                     coordinatesInPolygon.append(point)
         if (len(coordinatesInPolygon)<=3):
             return -1
-        end = time.time()
-        print("geting the coornates: ",end-Start,"\n\n" )
+        # end = time.time()
+        # print("geting the coornates: ",end-Start,"\n\n" )
         return LineString(coordinatesInPolygon)
 
     def make_image_format_indexing(self,coordintes):
-        Start = time.time()
+        # Start = time.time()
         coordintes = np.array(coordintes.xy)
         new_format = np.repeat(coordintes,3,1)
         new_format = np.append(new_format,np.array([np.tile(np.array([0,1,2]),int(len(coordintes[0])))]),axis=0)
-        end = time.time()
-        print("Numpy coornates: ",end-Start,"\n\n")
+        # end = time.time()
+        # print("Numpy coornates: ",end-Start,"\n\n")
         return new_format.astype(int)
     
     def get_indecies_on_rotate(self, SHIFT_X, SHIFT_Y, thetha):
