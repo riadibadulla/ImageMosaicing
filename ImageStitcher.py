@@ -40,7 +40,7 @@ class ImageStitcher:
     def calculateLoss(self,SHIFT):
         SHIFT_X,SHIFT_Y, thetha = SHIFT
         SHIFT_X, SHIFT_Y, thetha = int(SHIFT_X*(self.w1+self.w2)),int(SHIFT_Y*(self.h1+self.h2)),int(thetha*360)
-        print("SHIFT_X: ",SHIFT_X,"    SHIFT_Y: ",SHIFT_Y,"    Angle: ",thetha)
+        print("SHIFT_X: ",SHIFT_X,"    SHIFT_Y: ",SHIFT_Y,"    Angle: ",thetha) 
         if (SHIFT_X>=self.w1+self.img2_canvas_size-self.img2_canvas_size*0.05 or SHIFT_Y>=self.h1+self.img2_canvas_size-self.img2_canvas_size*0.05 or SHIFT_Y<self.img2_canvas_size*0.05 or SHIFT_X<self.img2_canvas_size*0.05):
             return 255*3*self.w1*self.h1*self.h2*self.w2
         self.coor_system.set_rectangles(self.getCornersOfImages((SHIFT_X,SHIFT_Y, thetha)))
@@ -80,7 +80,7 @@ class ImageStitcher:
         self.w1+int((self.img2_canvas_size-self.w2)/2):self.w1+self.w2+int((self.img2_canvas_size-self.w2)/2),
         :3] = self.img2
         self.canvas[:self.h1,:self.w1,:3] = self.img1
-        self.coor_system = CoordinateSystem((len(self.canvas[0]/2),len(self.canvas)/2))
+        self.coor_system = CoordinateSystem((len(self.canvas[0])/2,len(self.canvas)/2))
 
         savedParameters = [[],[]]
         intitial_cors_x = np.linspace(0.1,1,n,False)

@@ -22,7 +22,7 @@ class CoordinateSystem:
         centrex = self.centreOfRectangle2[0]
         centrey = self.centreOfRectangle2[1]
         #M = [[a,b,(1-a)*centrex*centrey],[-b,a,b*centrex+(1-a)*centrey],[0,0,1]]
-        M = [a,b,-b,a,(1-a)*centrex*centrey,b*centrex+(1-a)*centrey]
+        M = [a,b,-b,a,(1-a)*centrex-b*centrey,b*centrex+(1-a)*centrey]
         return affine_transform(geometricFigure,M)
 
     def rotateTranslateCoordinates(self,coor,centreX,centreY,angle):
@@ -56,11 +56,14 @@ class CoordinateSystem:
             return []
         coordinatesInPolygon = []
         bounds = polygon.bounds
-        for y in range(int(bounds[1]),int(bounds[3]-1)):
-            for x in range(int(bounds[0]),int(bounds[2]-1)):
+        for y in range(int(bounds[1]),int(bounds[3])):
+            for x in range(int(bounds[0]),int(bounds[2])):
                 if (Point(x,y).within(polygon)):
                     coordinatesInPolygon.append((x,y))
-        return np.array(LineString(coordinatesInPolygon).xy)
+        try:
+            return np.array(LineString(coordinatesInPolygon).xy)
+        except: 
+            return []
 
     # def get_coordinates_in_polygon(self,geom):
     #     exterior_coords = geom.exterior.coords[:]
@@ -85,7 +88,10 @@ class CoordinateSystem:
         coordinates_in_polygon1 = self.make_image_format_indexing(coordinates_in_polygon1)
         coordinates_in_polygon2 = self.get_coordinates_in_polygon(initialPolygon2)
         coordinates_in_polygon2 = self.make_image_format_indexing(coordinates_in_polygon2)
-        
+        coordinates_in_polygon1[0] = coordinates_in_polygon1[0] - SHIFT_X
+        coordinates_in_polygon1[1] = coordinates_in_polygon1[1] - SHIFT_Y
+
+
         return (coordinates_in_polygon1, coordinates_in_polygon2)
     
     # def getCoorOfIntersectionInInitImg2(self,coordinatesInPolygon,centreOfRectangle,angle):
