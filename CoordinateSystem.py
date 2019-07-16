@@ -63,13 +63,6 @@ class CoordinateSystem:
             return -1
         return LineString(coordinatesInPolygon)
 
-    # def get_coordinates_in_polygon(self,geom):
-    #     exterior_coords = geom.exterior.coords[:]
-    #     interior_coords = []
-    #     for interior in geom.interiors:
-    #         interior_coords += interior.coords[:]
-    #     return interior_coords
-
     def make_image_format_indexing(self,coordintes):
         coordintes = np.array(coordintes.xy)
         new_format = np.repeat(coordintes,3,1)
@@ -94,27 +87,3 @@ class CoordinateSystem:
 
 
         return (coordinates_in_polygon1, coordinates_in_polygon2)
-    
-    # def getCoorOfIntersectionInInitImg2(self,coordinatesInPolygon,centreOfRectangle,angle):
-    #     listOfInitialCoor = []
-    #     for coor in coordinatesInPolygon:
-    #         new_coordinate = self.rotateTranslateCoordinates(coor,centreOfRectangle[0],centreOfRectangle[1],angle)
-    #         new_coordinate = (int(new_coordinate[0]),int(new_coordinate[1]))
-    #         listOfInitialCoor.append(new_coordinate)
-    #     return listOfInitialCoor
-
-    # def get_initial_coord1(self,coor_with_shift, SHIFTX, SHIFTY):
-    #     coor = []
-    #     for coor_tupple in coor_with_shift:
-    #         coor.append((int(coor_tupple[0])-SHIFTX,int(coor_tupple[1])-SHIFTY))
-    #     return coor
-
-    # def get_numpy_format(self,initialCoordinates):
-    #     values = [[],[],[]]
-    #     for initial_coor in initialCoordinates:
-    #         for i in range(3):
-    #             values[0].append(initial_coor[0])
-    #             values[1].append(initial_coor[1])
-    #             values[2].append(i)
-    #     values = np.array(values)
-    #     return values
