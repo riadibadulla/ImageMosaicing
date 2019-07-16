@@ -40,9 +40,11 @@ class ImageStitcher:
     def calculateLoss(self,SHIFT):
         SHIFT_X,SHIFT_Y, thetha = SHIFT
         SHIFT_X, SHIFT_Y, thetha = int(SHIFT_X*(self.w1+self.w2)),int(SHIFT_Y*(self.h1+self.h2)),int(thetha*360)
-        print("SHIFT_X: ",SHIFT_X,"    SHIFT_Y: ",SHIFT_Y,"    Angle: ",thetha) 
+        print("SHIFT_X: ",SHIFT_X,"    SHIFT_Y: ",SHIFT_Y,"    Angle: ",thetha)
         if (SHIFT_X>=self.w1+self.img2_canvas_size-self.img2_canvas_size*0.05 or SHIFT_Y>=self.h1+self.img2_canvas_size-self.img2_canvas_size*0.05 or SHIFT_Y<self.img2_canvas_size*0.05 or SHIFT_X<self.img2_canvas_size*0.05):
             return 255*3*self.w1*self.h1*self.h2*self.w2
+        if (SHIFT_X ==68 and SHIFT_Y ==460):
+            print("hi")
         self.coor_system.set_rectangles(self.getCornersOfImages((SHIFT_X,SHIFT_Y, thetha)))
         coordinates_of_intersection = self.coor_system.get_indecies_on_rotate(SHIFT_X, SHIFT_Y,thetha)
         if (coordinates_of_intersection == -1):
@@ -86,11 +88,11 @@ class ImageStitcher:
         intitial_cors_x = np.linspace(0.1,1,n,False)
         intitial_cors_y = np.linspace(0.1,1,n,False)
         initial_param_thetha = np.linspace(0,1,n,False)
-        for i in range(n):
+        for i in range(1):
             thetha = initial_param_thetha[i]
-            for j in range(n):
+            for j in range(n-1):
                 x = intitial_cors_x[j]
-                for k in range(n):
+                for k in range(n-1):
                     y = intitial_cors_y[k]
                     print("Initial Values: ",x,"  ",y)
                     x0 = [x,y,thetha]
@@ -104,11 +106,11 @@ class ImageStitcher:
         print("\n\n\n\n\n\n")
         print(savedParameters)
         print("\n\n\n\n\n\n")
-        print(minimumErrorIndex)
-        print(savedParameters[0][minimumErrorIndex])
-        print(savedParameters[1][minimumErrorIndex][0]*(self.w1+self.w2))
-        print(savedParameters[1][minimumErrorIndex][1]*(self.w1+self.w2))
-        print(savedParameters[1][minimumErrorIndex][2]*360)
+        print("Error Index: ",minimumErrorIndex)
+        print("Minimum Loss: ",savedParameters[0][minimumErrorIndex])
+        print("Shift_X: ",savedParameters[1][minimumErrorIndex][0]*(self.w1+self.w2))
+        print("Shift_Y: ",savedParameters[1][minimumErrorIndex][1]*(self.w1+self.w2))
+        print("Thetha: ",savedParameters[1][minimumErrorIndex][2]*360)
         self.BestX = int(savedParameters[1][minimumErrorIndex][0]*(self.w1+self.w2))
         self.BestY = int(savedParameters[1][minimumErrorIndex][1]*(self.h1+self.h2))
         self.Best_Rotate = int(savedParameters[1][minimumErrorIndex][2]*360)
