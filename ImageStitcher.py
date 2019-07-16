@@ -5,6 +5,7 @@ from scipy.optimize import minimize
 import random
 import math
 from CoordinateSystem import CoordinateSystem
+import random
 
 class ImageStitcher:
     img1 = None
@@ -85,22 +86,16 @@ class ImageStitcher:
         self.coor_system = CoordinateSystem((len(self.canvas[0])/2,len(self.canvas)/2))
 
         savedParameters = [[],[]]
-        intitial_cors_x = np.linspace(0.1,1,n,False)
-        intitial_cors_y = np.linspace(0.1,1,n,False)
-        initial_param_thetha = np.linspace(0,1,n,False)
-        for i in range(1):
-            thetha = initial_param_thetha[i]
-            for j in range(n-1):
-                x = intitial_cors_x[j]
-                for k in range(n-1):
-                    y = intitial_cors_y[k]
-                    print("Initial Values: ",x,"  ",y)
-                    x0 = [x,y,thetha]
-                    res = minimize(self.calculateLoss,x0, method = 'nelder-mead', options={'disp':True})
-                    savedParameters[0].append(res.fun)
-                    print(res.fun)
-                    savedParameters[1].append(res.x)
-                    print("\n\n\n\n")
+        for i in range(n):
+            x = random.uniform(0,1)
+            y = random.uniform(0,1)
+            thetha = random.uniform(0,1)
+            print("Initial Values: ",x,"  ",y)
+            x0 = [x,y,thetha]
+            res = minimize(self.calculateLoss,x0, method = 'nelder-mead', options={'disp':True})
+            savedParameters[0].append(res.fun)
+            savedParameters[1].append(res.x)
+            print("\n\n\n\n")
         
         minimumErrorIndex = savedParameters[0].index(min(savedParameters[0]))
         print("\n\n\n\n\n\n")
