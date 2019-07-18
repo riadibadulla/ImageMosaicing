@@ -24,12 +24,12 @@ def getCornersOfImages(SHIFT):
     (w1+x_OffsetIMG2+w2,h1+y_OffsetIMG2+h2),(w1+x_OffsetIMG2+w2,h1+y_OffsetIMG2)]
     return rectangle1,rectangle2
 
-rectangles = getCornersOfImages((100,100,0))
+rectangles = getCornersOfImages((100,100,45))
 print(rectangles)
 coor_system.set_rectangles(rectangles)
-num = coor_system.get_indecies_on_rotate(100,100,90)
+num = coor_system.get_indecies_on_rotate(100,100,45)
 canvas[num[0]] = [0,0,0]
-#canvas[num[1]] = [0,0,0]
+canvas[num[1]] = [0,0,0]
 # print(num)
 cv2.imshow('images',canvas)
 cv2.waitKey(0)

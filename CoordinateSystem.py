@@ -2,6 +2,7 @@ from shapely.geometry import Polygon
 from shapely.geometry import Point
 from shapely.affinity import affine_transform
 from shapely.geometry import LineString
+import matplotlib.pyplot as plt
 import math
 import numpy as np
 import sys
@@ -42,6 +43,9 @@ class CoordinateSystem:
         return x,y
 
     def rotateCornersOfImage2(self,angle):
+        p2 = Polygon(self.rectangle2)
+        x, y =p2.exterior.xy
+        plt.plot(x, y, color='blue', alpha=0.7,linewidth=3, solid_capstyle='round', zorder=2)
         # Start = time.time()
         newRectangle = []
         for coor in self.rectangle2:
@@ -54,10 +58,17 @@ class CoordinateSystem:
     def get_intersection_polygon(self):
         # Start = time.time()
         p1 = Polygon(self.rectangle1)
+        x1,y1= p1.exterior.xy
         p2 = Polygon(self.rectangle2)
+        x2,y2= p2.exterior.xy
         intersection = p1.intersection(p2)
         # end = time.time()
         # print("get intersection: ",end-Start ,"\n\n")
+        x,y = intersection.exterior.xy
+        plt.plot(x1, y1, color='red', alpha=0.7,linewidth=3, solid_capstyle='round', zorder=2)
+        # plt.plot(x2, y2, color='blue', alpha=0.7,linewidth=3, solid_capstyle='round', zorder=2)
+        plt.plot(x, y, color='yellow', alpha=0.7,linewidth=3, solid_capstyle='round', zorder=2)
+        # plt.set_title('Polygon')
         return intersection
 
     def get_coordinates_in_polygon(self, polygon):
@@ -96,11 +107,13 @@ class CoordinateSystem:
         coordintes_of_intersection = self.get_coordinates_in_polygon(intersection)
         if coordintes_of_intersection == -1:
             return -1
-        initialPolygon2 = self.rotateElement(coordintes_of_intersection,-1*thetha)
+        initialPolygon2 = self.rotateElement(coordintes_of_intersection,360-thetha)
+        x,y = initialPolygon2.coords.xy
+        plt.plot(x, y, color='black', alpha=0.7,linewidth=3, solid_capstyle='round', zorder=2)
+        plt.show()
         coordinates_in_polygon1 = self.make_image_format_indexing(coordintes_of_intersection)
         coordinates_in_polygon2 = self.make_image_format_indexing(initialPolygon2)
         coordinates_in_polygon1[0] = coordinates_in_polygon1[0] - SHIFT_X
         coordinates_in_polygon1[1] = coordinates_in_polygon1[1] - SHIFT_Y
-
 
         return (coordinates_in_polygon1, coordinates_in_polygon2)

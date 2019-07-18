@@ -5,5 +5,5 @@
         "**/.settings": true,
         "**/.factorypath": true
     },
-    "python.pythonPath": "venv/bin/python"
+    "python.pythonPath": "/Library/Frameworks/Python.framework/Versions/3.6/bin/python3"
 }
