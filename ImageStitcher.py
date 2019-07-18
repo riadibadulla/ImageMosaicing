@@ -46,7 +46,7 @@ class ImageStitcher:
             return 255*3*self.w1*self.h1*self.h2*self.w2
         if (SHIFT_X ==68 and SHIFT_Y ==460):
             print("hi")
-        self.coor_system.set_rectangles(self.getCornersOfImages((SHIFT_X,SHIFT_Y, thetha)))
+        self.coor_system.set_rectangles(self.getCornersOfImages((SHIFT_X,SHIFT_Y, 360-thetha)))
         coordinates_of_intersection = self.coor_system.get_indecies_on_rotate(SHIFT_X, SHIFT_Y,thetha)
         if (coordinates_of_intersection == -1):
             return 255*3*self.w1*self.h1*self.h2*self.w2

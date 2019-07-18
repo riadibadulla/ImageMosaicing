@@ -1,4 +1,5 @@
 from CoordinateSystem import CoordinateSystem
+from ImageStitcher import ImageStitcher
 import cv2
 import numpy as np
 import math
@@ -28,8 +29,11 @@ rectangles = getCornersOfImages((100,100,45))
 print(rectangles)
 coor_system.set_rectangles(rectangles)
 num = coor_system.get_indecies_on_rotate(100,100,45)
-canvas[num[0]] = [0,0,0]
-canvas[num[1]] = [0,0,0]
-# print(num)
-cv2.imshow('images',canvas)
-cv2.waitKey(0)
+st = ImageStitcher(img1,img2,False)
+st.drawImage(100,100,360-45,0)
+
+# print(num[1][0])
+# canvas[num[0][:]] = 0
+# canvas[num[1][:]] = 0
+# cv2.imshow('images',canvas)
+# cv2.waitKey(0)
