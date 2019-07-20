@@ -88,9 +88,12 @@ class CoordinateSystem:
         new_format = np.append(new_format,np.array([np.tile(np.array([0,1,2]),int(len(coordintes[0])))]),axis=0)
         # end = time.time()
         # print("Numpy coornates: ",end-Start,"\n\n")
-        new_format = np.around(new_format)
-        return new_format.astype(int)
+        new_format = np.around(new_format).astype(int)
+        return new_format
     
+    def makeImageCoordinateFormat(self,new_format):
+        return (new_format[0],new_format[1],new_format[2])
+
     def get_indecies_on_rotate(self, SHIFT_X, SHIFT_Y, thetha):
         if (thetha != 0):
             self.rotateCornersOfImage2(thetha)
@@ -106,5 +109,7 @@ class CoordinateSystem:
         coordinates_in_polygon2 = self.make_image_format_indexing(initialPolygon2)
         coordinates_in_polygon1[0] = coordinates_in_polygon1[0] - SHIFT_X
         coordinates_in_polygon1[1] = coordinates_in_polygon1[1] - SHIFT_Y
-
+        coordinates_in_polygon1 = self.makeImageCoordinateFormat(coordinates_in_polygon1)
+        coordinates_in_polygon2 = self.makeImageCoordinateFormat(coordinates_in_polygon2)
+        
         return (coordinates_in_polygon1, coordinates_in_polygon2)

@@ -12,7 +12,7 @@ class main:
 
     if __name__=='__main__':
         START_TIME = time.time()
-        img1 = cv2.imread('images/Map1.png')
+        img1 = cv2.imread('images/Map1-rotate.png')
         img2 = cv2.imread('images/Map2.png')  
         mosaic2Images(img1,img2)
         END_TIME = time.time()
