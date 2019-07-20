@@ -88,6 +88,7 @@ class CoordinateSystem:
         new_format = np.append(new_format,np.array([np.tile(np.array([0,1,2]),int(len(coordintes[0])))]),axis=0)
         # end = time.time()
         # print("Numpy coornates: ",end-Start,"\n\n")
+        new_format = np.around(new_format)
         return new_format.astype(int)
     
     def get_indecies_on_rotate(self, SHIFT_X, SHIFT_Y, thetha):
