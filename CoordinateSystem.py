@@ -20,6 +20,8 @@ class CoordinateSystem:
         self.centreOfRectangle2 = centre
     
     def set_rectangles(self,rectangles):
+        plt.clf()
+        plt.gca().invert_yaxis()
         self.rectangle1, self.rectangle2 = rectangles
         rec1 = Polygon(self.rectangle1)	
         rec2 = Polygon(self.rectangle2)	
@@ -135,7 +137,6 @@ class CoordinateSystem:
         # coordinates_in_polygon1[1] = coordinates_in_polygon1[1] - SHIFT_X
         coordinates_in_polygon1 = self.makeImageCoordinateFormat(coordinates_in_polygon1)
         coordinates_in_polygon2 = self.makeImageCoordinateFormat(coordinates_in_polygon2)
-        plt.gca().invert_yaxis()
-        plt.axis('equal')
-        plt.savefig("polygon.png")
+        # plt.axis('equal')
+        # plt.savefig("polygon.png")
         return (coordinates_in_polygon1, coordinates_in_polygon2)
