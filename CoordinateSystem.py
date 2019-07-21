@@ -9,8 +9,9 @@ import matplotlib.pyplot as plt
 import matplotlib
 import math
 import numpy as np
+from joblib import Parallel, delayed
 # import sys
-# import time
+import time
 
 class CoordinateSystem:
     rectangle1 = []
@@ -21,15 +22,15 @@ class CoordinateSystem:
         self.centreOfRectangle2 = centre
     
     def set_rectangles(self,rectangles):
-        plt.clf()
-        plt.gca().invert_yaxis()
+        # plt.clf()
+        # plt.gca().invert_yaxis()
         self.rectangle1, self.rectangle2 = rectangles
         rec1 = Polygon(self.rectangle1)	
         rec2 = Polygon(self.rectangle2)	
-        x1, y1 =rec1.exterior.xy	
-        x2, y2 =rec2.exterior.xy	
-        plt.plot(x1, y1,color='yellow')
-        plt.plot(x2, y2,color='black')
+        # x1, y1 =rec1.exterior.xy	
+        # x2, y2 =rec2.exterior.xy	
+        # plt.plot(x1, y1,color='yellow')
+        # plt.plot(x2, y2,color='black')
         
     def rotateElement(self,geometricFigure, thetha):
         # Start = time.time()
@@ -72,8 +73,8 @@ class CoordinateSystem:
         M = [1,0,0,1,-SHIFT_X,-SHIFT_Y]
         rotated = affine_transform(geometric_figure,M)
         rotated = loads(dumps(rotated, rounding_precision=0))
-        x,y = rotated.coords.xy
-        plt.plot(x,y,color='magenta')
+        # x,y = rotated.coords.xy
+        # plt.plot(x,y,color='magenta')
         return rotated
 
     def get_intersection_polygon(self):
@@ -89,7 +90,7 @@ class CoordinateSystem:
         return intersection
 
     def get_coordinates_in_polygon(self, polygon):
-        # Start = time.time()
+        #Start = time.time()
         if (polygon.area == 0.0):
             return []
         coordinatesInPolygon = []
@@ -101,8 +102,8 @@ class CoordinateSystem:
                     coordinatesInPolygon.append(point)
         if (len(coordinatesInPolygon)<=3):
             return -1
-        # end = time.time()
-        # print("geting the coornates: ",end-Start,"\n\n" )
+        #end = time.time()
+        #print("geting the coornates: ",end-Start,"\n\n" )
         return LineString(coordinatesInPolygon)
 
     def make_image_format_indexing(self,coordintes):
@@ -121,26 +122,24 @@ class CoordinateSystem:
     def get_indecies_on_rotate(self, SHIFT_X, SHIFT_Y, thetha):
         if (thetha != 0):
             self.rotateCornersOfImage2(thetha)
-        x2, y2 =Polygon(self.rectangle2).exterior.xy	
-        plt.plot(x2, y2,color='red')
+        # x2, y2 =Polygon(self.rectangle2).exterior.xy	
+        # plt.plot(x2, y2,color='red')
         intersection = self.get_intersection_polygon()
         if (intersection.area == 0.0):
             return -1
-        x2, y2 =intersection.exterior.xy	
-        plt.plot(x2, y2,color='green')
+        # x2, y2 =intersection.exterior.xy	
+        # plt.plot(x2, y2,color='green')
         coordintes_of_intersection = self.get_coordinates_in_polygon(intersection)
         if coordintes_of_intersection == -1:
             return -1
         initialPolygon2 = self.rotateElement(coordintes_of_intersection,-thetha)
         initialPolygon1 = self.shiftAnElement(coordintes_of_intersection,SHIFT_X,SHIFT_Y)
-        x2, y2 =initialPolygon2.coords.xy	
-        plt.plot(x2, y2,color='blue')
+        # x2, y2 =initialPolygon2.coords.xy	
+        # plt.plot(x2, y2,color='blue')
         coordinates_in_polygon1 = self.make_image_format_indexing(initialPolygon1)
         coordinates_in_polygon2 = self.make_image_format_indexing(initialPolygon2)
-        # coordinates_in_polygon1[0] = coordinates_in_polygon1[0] - SHIFT_Y
-        # coordinates_in_polygon1[1] = coordinates_in_polygon1[1] - SHIFT_X
         coordinates_in_polygon1 = self.makeImageCoordinateFormat(coordinates_in_polygon1)
         coordinates_in_polygon2 = self.makeImageCoordinateFormat(coordinates_in_polygon2)
-        plt.axis('equal')
-        plt.savefig("polygon.png")
+        # plt.axis('equal')
+        # plt.savefig("polygon.png")
         return (coordinates_in_polygon1, coordinates_in_polygon2)
