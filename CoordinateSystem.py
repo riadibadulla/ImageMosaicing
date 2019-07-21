@@ -2,6 +2,8 @@ from shapely.geometry import Polygon
 from shapely.geometry import Point
 from shapely.affinity import affine_transform
 from shapely.geometry import LineString
+from shapely.wkt import loads
+from shapely.wkt import dumps
 import matplotlib.pyplot as plt
 import matplotlib
 import math
@@ -19,6 +21,12 @@ class CoordinateSystem:
     
     def set_rectangles(self,rectangles):
         self.rectangle1, self.rectangle2 = rectangles
+        rec1 = Polygon(self.rectangle1)	
+        rec2 = Polygon(self.rectangle2)	
+        x1, y1 =rec1.exterior.xy	
+        x2, y2 =rec2.exterior.xy	
+        plt.plot(x1, y1,color='yellow')
+        plt.plot(x2, y2,color='black')
         
     def rotateElement(self,geometricFigure, thetha):
         # Start = time.time()
@@ -26,9 +34,10 @@ class CoordinateSystem:
         b = math.sin(thetha)
         centrex = self.centreOfRectangle2[0]
         centrey = self.centreOfRectangle2[1]
-        #M = [[a,b,(1-a)*centrex*centrey],[-b,a,b*centrex+(1-a)*centrey],[0,0,1]]
-        M = [a,b,-b,a,(1-a)*centrex-b*centrey,b*centrex+(1-a)*centrey]
+        #M = [[a,b,(1-a)*centrex-b*centrey],[-b,a,b*centrex+(1-a)*centrey],[0,0,1]]
+        M = [a,-b,b,a,(1-a)*centrex+b*centrey,centrey -b*centrex-a*centrey]
         rotated = affine_transform(geometricFigure,M)
+        rotated = loads(dumps(rotated, rounding_precision=0))
         # end = time.time()
         # print("Rotate line: ",end-Start,"\n\n" )
         return rotated
@@ -58,6 +67,7 @@ class CoordinateSystem:
         p1 = Polygon(self.rectangle1)
         x1,y1= p1.exterior.xy
         p2 = Polygon(self.rectangle2)
+        p2 = loads(dumps(p2, rounding_precision=0))
         x2,y2= p2.exterior.xy
         intersection = p1.intersection(p2)
         # end = time.time()
@@ -97,19 +107,26 @@ class CoordinateSystem:
     def get_indecies_on_rotate(self, SHIFT_X, SHIFT_Y, thetha):
         if (thetha != 0):
             self.rotateCornersOfImage2(thetha)
+        x2, y2 =Polygon(self.rectangle2).exterior.xy	
+        plt.plot(x2, y2,color='red')
         intersection = self.get_intersection_polygon()
         if (intersection.area == 0.0):
             return -1
-        
+        x2, y2 =intersection.exterior.xy	
+        plt.plot(x2, y2,color='green')
         coordintes_of_intersection = self.get_coordinates_in_polygon(intersection)
         if coordintes_of_intersection == -1:
             return -1
         initialPolygon2 = self.rotateElement(coordintes_of_intersection,360-thetha)
+        x2, y2 =initialPolygon2.coords.xy	
+        plt.plot(x2, y2,color='blue')
         coordinates_in_polygon1 = self.make_image_format_indexing(coordintes_of_intersection)
         coordinates_in_polygon2 = self.make_image_format_indexing(initialPolygon2)
-        coordinates_in_polygon1[0] = coordinates_in_polygon1[0] - SHIFT_X
-        coordinates_in_polygon1[1] = coordinates_in_polygon1[1] - SHIFT_Y
+        coordinates_in_polygon1[0] = coordinates_in_polygon1[0] - SHIFT_Y
+        coordinates_in_polygon1[1] = coordinates_in_polygon1[1] - SHIFT_X
         coordinates_in_polygon1 = self.makeImageCoordinateFormat(coordinates_in_polygon1)
         coordinates_in_polygon2 = self.makeImageCoordinateFormat(coordinates_in_polygon2)
-        
+        plt.gca().invert_yaxis()
+        plt.axis('equal')
+        plt.savefig("polygon.png")
         return (coordinates_in_polygon1, coordinates_in_polygon2)
