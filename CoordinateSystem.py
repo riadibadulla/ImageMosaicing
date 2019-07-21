@@ -62,6 +62,14 @@ class CoordinateSystem:
         # end = time.time()
         # print("rotate corners: ",end-Start,"\n\n" )
     
+    def shiftAnElement(self,geometric_figure, SHIFT_X,SHIFT_Y):
+        M = [1,0,0,1,-SHIFT_X,-SHIFT_Y]
+        rotated = affine_transform(geometric_figure,M)
+        rotated = loads(dumps(rotated, rounding_precision=0))
+        x,y = rotated.coords.xy
+        plt.plot(x,y,color='magenta')
+        return rotated
+
     def get_intersection_polygon(self):
         # Start = time.time()
         p1 = Polygon(self.rectangle1)
@@ -118,12 +126,13 @@ class CoordinateSystem:
         if coordintes_of_intersection == -1:
             return -1
         initialPolygon2 = self.rotateElement(coordintes_of_intersection,360-thetha)
+        initialPolygon1 = self.shiftAnElement(coordintes_of_intersection,SHIFT_X,SHIFT_Y)
         x2, y2 =initialPolygon2.coords.xy	
         plt.plot(x2, y2,color='blue')
-        coordinates_in_polygon1 = self.make_image_format_indexing(coordintes_of_intersection)
+        coordinates_in_polygon1 = self.make_image_format_indexing(initialPolygon1)
         coordinates_in_polygon2 = self.make_image_format_indexing(initialPolygon2)
-        coordinates_in_polygon1[0] = coordinates_in_polygon1[0] - SHIFT_Y
-        coordinates_in_polygon1[1] = coordinates_in_polygon1[1] - SHIFT_X
+        # coordinates_in_polygon1[0] = coordinates_in_polygon1[0] - SHIFT_Y
+        # coordinates_in_polygon1[1] = coordinates_in_polygon1[1] - SHIFT_X
         coordinates_in_polygon1 = self.makeImageCoordinateFormat(coordinates_in_polygon1)
         coordinates_in_polygon2 = self.makeImageCoordinateFormat(coordinates_in_polygon2)
         plt.gca().invert_yaxis()

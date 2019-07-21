@@ -40,8 +40,8 @@ class ImageStitcher:
 
     def calculateLoss(self,SHIFT):
         SHIFT_X,SHIFT_Y, thetha = SHIFT
-        SHIFT_X, SHIFT_Y, thetha = int(SHIFT_X*(self.w1+self.w2)),int(SHIFT_Y*(self.h1+self.h2)),int(thetha*360)
-        # SHIFT_X, SHIFT_Y, thetha = int(SHIFT_X),int(SHIFT_Y),int(thetha)
+        # SHIFT_X, SHIFT_Y, thetha = int(SHIFT_X*(self.w1+self.w2)),int(SHIFT_Y*(self.h1+self.h2)),int(thetha*360)
+        SHIFT_X, SHIFT_Y, thetha = int(SHIFT_X),int(SHIFT_Y),int(thetha)
         print("SHIFT_X: ",SHIFT_X,"    SHIFT_Y: ",SHIFT_Y,"    Angle: ",thetha)
         if (SHIFT_X>=self.w1+self.img2_canvas_size-self.img2_canvas_size*0.05 or SHIFT_Y>=self.h1+self.img2_canvas_size-self.img2_canvas_size*0.05 or SHIFT_Y<self.img2_canvas_size*0.05 or SHIFT_X<self.img2_canvas_size*0.05):
             return 255*3*self.w1*self.h1*self.h2*self.w2
