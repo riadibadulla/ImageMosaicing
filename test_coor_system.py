@@ -27,15 +27,15 @@ def getCornersOfImages(SHIFT):
     (w1+x_OffsetIMG2+w2,h1+y_OffsetIMG2+h2),(w1+x_OffsetIMG2,h1+y_OffsetIMG2+h2)]
     return rectangle1,rectangle2
 
-rectangles = getCornersOfImages((15,234,215))
+rectangles = getCornersOfImages((242,62,256))
 print(rectangles)
 coor_system.set_rectangles(rectangles)
-num = coor_system.get_indecies_on_rotate(15,234,215)
+num = coor_system.get_indecies_on_rotate(242,62,256)
 
 st = ImageStitcher(img1,img2,False)
-st.drawImage(15,234,360-215,0)
+st.drawImage(242,62,360-256,0)
 st.set_canvas()
-print(st.calculateLoss((15,234,215)))
+print(st.calculateLoss((242,62,256)))
 # print(st.calculateLoss((92,92,45)))
 print(num[1][0])
 canvas[num[0][:]] = 240

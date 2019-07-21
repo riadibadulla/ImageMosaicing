@@ -1,6 +1,7 @@
 from shapely.geometry import Polygon
 from shapely.geometry import Point
 from shapely.affinity import affine_transform
+from shapely.affinity import rotate
 from shapely.geometry import LineString
 from shapely.wkt import loads
 from shapely.wkt import dumps
@@ -32,14 +33,17 @@ class CoordinateSystem:
         
     def rotateElement(self,geometricFigure, thetha):
         # Start = time.time()
-        a = math.cos(thetha)
-        b = math.sin(thetha)
-        centrex = self.centreOfRectangle2[0]
-        centrey = self.centreOfRectangle2[1]
-        #M = [[a,b,(1-a)*centrex-b*centrey],[-b,a,b*centrex+(1-a)*centrey],[0,0,1]]
-        M = [a,-b,b,a,(1-a)*centrex+b*centrey,centrey -b*centrex-a*centrey]
-        rotated = affine_transform(geometricFigure,M)
-        rotated = loads(dumps(rotated, rounding_precision=0))
+        # a = math.cos(thetha)
+        # b = math.sin(thetha)
+        centrex, centrey = Polygon(self.rectangle2).centroid.coords.xy
+        centrex, centrey = centrex[0], centrey[0]
+        # M = [a,-b,b,a,(1-a)*centrex+b*centrey,centrey -b*centrex-a*centrey]
+        # rotated = affine_transform(geometricFigure,M)
+        # rotated = loads(dumps(rotated, rounding_precision=0))
+
+        rotated = rotate(geometricFigure, thetha,origin=(centrex,centrey))
+        
+        
         # end = time.time()
         # print("Rotate line: ",end-Start,"\n\n" )
         return rotated
@@ -127,7 +131,7 @@ class CoordinateSystem:
         coordintes_of_intersection = self.get_coordinates_in_polygon(intersection)
         if coordintes_of_intersection == -1:
             return -1
-        initialPolygon2 = self.rotateElement(coordintes_of_intersection,360-thetha)
+        initialPolygon2 = self.rotateElement(coordintes_of_intersection,-thetha)
         initialPolygon1 = self.shiftAnElement(coordintes_of_intersection,SHIFT_X,SHIFT_Y)
         x2, y2 =initialPolygon2.coords.xy	
         plt.plot(x2, y2,color='blue')
@@ -137,6 +141,6 @@ class CoordinateSystem:
         # coordinates_in_polygon1[1] = coordinates_in_polygon1[1] - SHIFT_X
         coordinates_in_polygon1 = self.makeImageCoordinateFormat(coordinates_in_polygon1)
         coordinates_in_polygon2 = self.makeImageCoordinateFormat(coordinates_in_polygon2)
-        # plt.axis('equal')
-        # plt.savefig("polygon.png")
+        plt.axis('equal')
+        plt.savefig("polygon.png")
         return (coordinates_in_polygon1, coordinates_in_polygon2)
