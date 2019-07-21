@@ -7,6 +7,7 @@ import math
 from CoordinateSystem import CoordinateSystem
 import random
 import sys
+from joblib import Parallel, delayed
 
 class ImageStitcher:
     img1 = None
@@ -84,21 +85,22 @@ class ImageStitcher:
         self.canvas[:self.h1,:self.w1,:3] = self.img1
         self.coor_system = CoordinateSystem((len(self.canvas[0])/2,len(self.canvas)/2))
 
-    def mosaicImages(self,n):
+    def run_nelder_mead(self,i,n):
+        x = random.uniform(0,1)
+        y = random.uniform(0,1)
+        thetha = random.uniform(0,1)
+        print("Iteration N: ",i+1,"/",n+1)
+        print("    Initial Values: ",x,"  ",y,"  ",thetha)
+        x0 = [x,y,thetha]
+        res = minimize(self.calculateLoss,x0, method = 'nelder-mead', options={'disp':True})
+        print("\n\n\n\n")
+        return [res.fun,res.x]
+
+    def mosaicImagqes(self,n):
         print("\n\n\n")
         self.set_canvas()
-        savedParameters = [[],[]]
-        for i in range(n):
-            x = random.uniform(0,1)
-            y = random.uniform(0,1)
-            thetha = random.uniform(0,1)
-            print("Iteration N: ",i+1,"/",n+1)
-            print("    Initial Values: ",x,"  ",y,"  ",thetha)
-            x0 = [x,y,thetha]
-            res = minimize(self.calculateLoss,x0, method = 'nelder-mead', options={'disp':True})
-            savedParameters[0].append(res.fun)
-            savedParameters[1].append(res.x)
-            print("\n\n\n\n")
+        savedParameters = Parallel(n_jobs=1, backend="threading")(delayed(self.run_nelder_mead)(i,n) for i in range(n))
+        savedParameters = np.array(savedParameters).T.tolist()
         
         minimumErrorIndex = savedParameters[0].index(min(savedParameters[0]))
         print("\n\n\n\n\n\n")
