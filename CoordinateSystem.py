@@ -110,7 +110,7 @@ class CoordinateSystem:
         return new_format
     
     def makeImageCoordinateFormat(self,new_format):
-        return (new_format[0],new_format[1],new_format[2])
+        return (new_format[1],new_format[0],new_format[2])
 
     def get_indecies_on_rotate(self, SHIFT_X, SHIFT_Y, thetha):
         if (thetha != 0):
