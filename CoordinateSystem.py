@@ -1,4 +1,5 @@
 from shapely.geometry import Polygon
+from shapely.geometry import CAP_STYLE
 from shapely.geometry import Point
 from shapely.affinity import affine_transform
 from shapely.affinity import rotate
@@ -20,6 +21,7 @@ class CoordinateSystem:
 
     def __init__(self,centre):
         self.centreOfRectangle2 = centre
+        CAP_STYLE.flat
     
     def set_rectangles(self,rectangles):
         # plt.clf()
@@ -33,21 +35,19 @@ class CoordinateSystem:
         # plt.plot(x2, y2,color='black')
         
     def rotateElement(self,geometricFigure, thetha):
-        # Start = time.time()
+        Start = time.time()
         # a = math.cos(thetha)
         # b = math.sin(thetha)
         centrex, centrey = Polygon(self.rectangle2).centroid.coords.xy
         centrex, centrey = centrex[0], centrey[0]
-        # M = [a,-b,b,a,(1-a)*centrex+b*centrey,centrey -b*centrex-a*centrey]
-        # rotated = affine_transform(geometricFigure,M)
+        coords = np.array(geometricFigure.coords)
+        rotated = np.array([self.rotateTranslateCoordinates(tuple(point),centrex,centrey,thetha) for point in coords])
+        rotated = rotated.T
+        # rotated = rotate(geometricFigure, thetha,origin=(centrex,centrey))
         # rotated = loads(dumps(rotated, rounding_precision=0))
-
-        rotated = rotate(geometricFigure, thetha,origin=(centrex,centrey))
-        
-        
-        # end = time.time()
-        # print("Rotate line: ",end-Start,"\n\n" )
-        return rotated
+        end = time.time()
+        print("Rotate line: ",end-Start,"\n\n" )
+        return rotated.astype(int)
 
     def rotateTranslateCoordinates(self,coor,centreX,centreY,angle):
         X,Y = coor
@@ -112,9 +112,12 @@ class CoordinateSystem:
         # print("geting the coornates: ",end-Start,"\n\n" )
         return LineString(coordinatesInPolygon)
 
+    def get_numpy_coords(self, shape):
+        coordintes = np.array(shape.xy)
+        return coordintes
+
     def make_image_format_indexing(self,coordintes):
         # Start = time.time()
-        coordintes = np.array(coordintes.xy)
         new_format = np.repeat(coordintes,3,1)
         new_format = np.append(new_format,np.array([np.tile(np.array([0,1,2]),int(len(coordintes[0])))]),axis=0)
         # end = time.time()
@@ -138,12 +141,13 @@ class CoordinateSystem:
         coordintes_of_intersection = self.get_coordinates_in_polygon(intersection)
         if coordintes_of_intersection == -1:
             return -1
-        initialPolygon2 = self.rotateElement(coordintes_of_intersection,-thetha)
+        numpy_coords_2 = self.rotateElement(coordintes_of_intersection,-thetha)
         initialPolygon1 = self.shiftAnElement(coordintes_of_intersection,SHIFT_X,SHIFT_Y)
         # x2, y2 =initialPolygon2.coords.xy	
         # plt.plot(x2, y2,color='blue')
-        coordinates_in_polygon1 = self.make_image_format_indexing(initialPolygon1)
-        coordinates_in_polygon2 = self.make_image_format_indexing(initialPolygon2)
+        numpy_coords_1 = self.get_numpy_coords(initialPolygon1)
+        coordinates_in_polygon1 = self.make_image_format_indexing(numpy_coords_1)
+        coordinates_in_polygon2 = self.make_image_format_indexing(numpy_coords_2)
         coordinates_in_polygon1 = self.makeImageCoordinateFormat(coordinates_in_polygon1)
         coordinates_in_polygon2 = self.makeImageCoordinateFormat(coordinates_in_polygon2)
         # plt.axis('equal')
