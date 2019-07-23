@@ -13,6 +13,7 @@ import numpy as np
 from joblib import Parallel, delayed
 # import sys
 import time
+SAMPLING_RATE = 10
 
 class CoordinateSystem:
     rectangle1 = []
@@ -92,12 +93,16 @@ class CoordinateSystem:
     def get_coordinates_in_polygon(self, polygon):
         #Start = time.time()
         p1 = Polygon(self.rectangle1)
-        if (polygon.area <= p1.area*0.4):
+        if (polygon.area <= p1.area*0.15):
             return -1
         coordinatesInPolygon = []
         bounds = polygon.bounds
-        y_step = round((int(bounds[3]) - int(bounds[1]))/30)
-        x_step = round((int(bounds[2]) - int(bounds[0]))/30)
+        height = int(bounds[3]) - int(bounds[1])
+        width = int(bounds[2]) - int(bounds[0])
+        y_num_samples = round(height/100*SAMPLING_RATE)
+        x_num_samples = round(width/100*SAMPLING_RATE)
+        y_step = int(round(height/y_num_samples))
+        x_step = int(round(width/x_num_samples))
         if (x_step<1):
             x_step = 1
         if (y_step<1):
