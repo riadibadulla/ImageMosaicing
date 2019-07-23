@@ -42,9 +42,8 @@ class ImageStitcher:
 
     def calculateLoss(self,SHIFT):
         SHIFT_X,SHIFT_Y, thetha = SHIFT
-        # SHIFT_X, SHIFT_Y, thetha = int(SHIFT_X*(self.w1+self.w2)),int(SHIFT_Y*(self.h1+self.h2)),int(thetha*360)
-        SHIFT_X, SHIFT_Y, thetha = int(SHIFT_X),int(SHIFT_Y),int(thetha)
-        sys.stdout.write("\r    SHIFT_X:{0},    SHIFT_Y:{1},    Angle:{2}         ☚||||".format(SHIFT_X,SHIFT_Y,thetha))
+        SHIFT_X, SHIFT_Y, thetha = int(SHIFT_X*(self.w1+self.w2)),int(SHIFT_Y*(self.h1+self.h2)),int(thetha*360)
+        # SHIFT_X, SHIFT_Y, thetha = int(SHIFT_X),int(SHIFT_Y),int(thetha)
         if (SHIFT_X>=self.w1+self.img2_canvas_size-self.img2_canvas_size*0.05 or SHIFT_Y>=self.h1+self.img2_canvas_size-self.img2_canvas_size*0.05 or SHIFT_Y<self.img2_canvas_size*0.05 or SHIFT_X<self.img2_canvas_size*0.05):
             return 255*3*self.w1*self.h1*self.h2*self.w2
         self.coor_system.set_rectangles(self.getCornersOfImages((SHIFT_X,SHIFT_Y, 360-thetha)))
@@ -54,6 +53,7 @@ class ImageStitcher:
         #self.drawImage(SHIFT_X, SHIFT_Y, thetha,100)
         difference = np.square(np.subtract(self.canvas[coordinates_of_intersection[0]],self.canvas[coordinates_of_intersection[1]]))
         loss = np.mean(difference)
+        sys.stdout.write("\r    SHIFT_X:{0},    SHIFT_Y:{1},    Angle:{2},    Loss:{3}       ☚||||".format(SHIFT_X,SHIFT_Y,thetha,loss))
         return loss
 
     def drawImage(self,X,Y, thetha,time):

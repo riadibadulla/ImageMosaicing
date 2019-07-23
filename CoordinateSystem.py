@@ -35,7 +35,7 @@ class CoordinateSystem:
         # plt.plot(x2, y2,color='black')
         
     def rotateElement(self,geometricFigure, thetha):
-        Start = time.time()
+        # Start = time.time()
         # a = math.cos(thetha)
         # b = math.sin(thetha)
         centrex, centrey = Polygon(self.rectangle2).centroid.coords.xy
@@ -45,8 +45,8 @@ class CoordinateSystem:
         rotated = rotated.T
         # rotated = rotate(geometricFigure, thetha,origin=(centrex,centrey))
         # rotated = loads(dumps(rotated, rounding_precision=0))
-        end = time.time()
-        print("Rotate line: ",end-Start,"\n\n" )
+        # end = time.time()
+        # print("Rotate line: ",end-Start,"\n\n" )
         return rotated.astype(int)
 
     def rotateTranslateCoordinates(self,coor,centreX,centreY,angle):
