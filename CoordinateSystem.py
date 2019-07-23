@@ -89,27 +89,30 @@ class CoordinateSystem:
         # print("get intersection: ",end-Start ,"\n\n")
         return intersection
 
-    def get_indecies_in_row(self,polygon,x,y):
-        point = Point(x,y)
-        if (point.within(polygon)):
-            return point
-
     def get_coordinates_in_polygon(self, polygon):
-        # Start = time.time()
-        if (polygon.area == 0.0):
-            return []
+        #Start = time.time()
+        p1 = Polygon(self.rectangle1)
+        if (polygon.area <= p1.area*0.4):
+            return -1
         coordinatesInPolygon = []
         bounds = polygon.bounds
-        for y in range(int(bounds[1]),int(bounds[3])):
-            new_cord = Parallel(n_jobs=1, backend="threading")(delayed(self.get_indecies_in_row)(polygon,x,y) for x in range(int(bounds[0]),int(bounds[2])))
-            if (new_cord !=[]):
-                coordinatesInPolygon.extend(new_cord)
-        coordinatesInPolygon = np.ravel(np.array(coordinatesInPolygon))
-        coordinatesInPolygon = coordinatesInPolygon[coordinatesInPolygon != np.array(None)].tolist()
+        y_step = round((int(bounds[3]) - int(bounds[1]))/30)
+        x_step = round((int(bounds[2]) - int(bounds[0]))/30)
+        if (x_step<1):
+            x_step = 1
+        if (y_step<1):
+            y_step = 1
+        bounds = polygon.bounds
+
+        for y in range(int(bounds[1]),int(bounds[3]),int(y_step)):
+            for x in range(int(bounds[0]),int(bounds[2]), int(x_step)):
+                point = Point(x,y)
+                if (point.within(polygon)):
+                    coordinatesInPolygon.append(point)
         if (len(coordinatesInPolygon)<=3):
             return -1
-        # end = time.time()
-        # print("geting the coornates: ",end-Start,"\n\n" )
+        #end = time.time()
+        #print("geting the coornates: ",end-Start,"\n\n" )
         return LineString(coordinatesInPolygon)
 
     def get_numpy_coords(self, shape):
