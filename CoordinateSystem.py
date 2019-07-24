@@ -59,6 +59,13 @@ class CoordinateSystem:
         # print("Rotate line: ",end-Start,"\n\n" )
         return rotated
     
+    def get_inverse_matrix(self,M):
+        M_matrix = [[M[0],M[1],M[4]],[M[2],M[3],M[5]],[0,0,1]]
+        np_matrix = np.matrix(M_matrix)
+        np_matrix_inverse = np.array(np_matrix.I)
+        M_inverse = [np_matrix_inverse[0][0],np_matrix_inverse[0][1],np_matrix_inverse[1][0],np_matrix_inverse[1][1],np_matrix_inverse[0][2],np_matrix_inverse[1][2]]
+        return M_inverse
+
     def shiftAnElement(self,geometric_figure, SHIFT_X,SHIFT_Y):
         M = [1,0,0,1,SHIFT_X,SHIFT_Y]
         rotated = affine_transform(geometric_figure,M)
@@ -124,10 +131,12 @@ class CoordinateSystem:
     def makeImageCoordinateFormat(self,new_format):
         return (new_format[1],new_format[0],new_format[2])
 
-    def get_indecies_on_rotate(self, SHIFT_X, SHIFT_Y, thetha):
-        if (thetha != 0):
-            self.polygon2 = self.rotateElement(self.polygon2,thetha)
-        self.polygon1 = self.shiftAnElement(self.polygon1,SHIFT_X,SHIFT_Y)
+    def get_indecies_on_rotate(self, parameters):
+        a,b,c,d,e,f,a1,b1,c1,d1,e1,f1 = parameters
+        M1 = [a,b,c,d,e,f]
+        M2 = [a1,b1,c1,d1,e1,f1]
+        self.polygon1 = self.transform(M1,self.polygon1)
+        self.polygon2 = self.transform(M2,self.polygon2)
         # x2, y2 =Polygon(self.rectangle2).exterior.xy	
         # plt.plot(x2, y2,color='red')
         intersection = self.get_intersection_polygon()
@@ -138,8 +147,8 @@ class CoordinateSystem:
         coordintes_of_intersection = self.get_coordinates_in_polygon(intersection)
         if coordintes_of_intersection == -1:
             return -1
-        initialPolygon2 = self.rotateElement(coordintes_of_intersection,-thetha)
-        initialPolygon1 = self.shiftAnElement(coordintes_of_intersection,-SHIFT_X,-SHIFT_Y)
+        initialPolygon2 = self.transform(coordintes_of_intersection,self.get_inverse_matrix(M2))
+        initialPolygon1 = self.transform(coordintes_of_intersection,self.get_inverse_matrix(M1))
         # x2, y2 =initialPolygon2.coords.xy	
         # plt.plot(x2, y2,color='blue')
         numpy_coords_1 = self.get_numpy_coords(initialPolygon1)

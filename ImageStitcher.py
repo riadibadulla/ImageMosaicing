@@ -39,21 +39,16 @@ class ImageStitcher:
         (self.w1+x_OffsetIMG2+self.w2,self.h1+y_OffsetIMG2+self.h2),(self.w1+x_OffsetIMG2+self.w2,self.h1+y_OffsetIMG2)]
         return rectangle1,rectangle2
 
-    def calculateLoss(self,SHIFT):
-        SHIFT_X,SHIFT_Y, thetha = SHIFT
-        SHIFT_X, SHIFT_Y, thetha = int(SHIFT_X*(self.w1+self.w2)),int(SHIFT_Y*(self.h1+self.h2)),int(thetha*360)
+    def calculateLoss(self,parameters):
         # SHIFT_X, SHIFT_Y, thetha = int(SHIFT_X),int(SHIFT_Y),int(thetha)
-        sys.stdout.write("\r    SHIFT_X:{0},    SHIFT_Y:{1},    Angle:{2}    ☚||||".format(SHIFT_X,SHIFT_Y,thetha))
-        if (SHIFT_X>=self.w1+self.img2_canvas_size-self.img2_canvas_size*0.05 or SHIFT_Y>=self.h1+self.img2_canvas_size-self.img2_canvas_size*0.05 or SHIFT_Y<self.img2_canvas_size*0.05 or SHIFT_X<self.img2_canvas_size*0.05):
-            return 255*3*self.w1*self.h1*self.h2*self.w2
         self.coor_system.set_rectangles(self.getCornersOfImages())
-        coordinates_of_intersection = self.coor_system.get_indecies_on_rotate(SHIFT_X, SHIFT_Y,thetha)
+        coordinates_of_intersection = self.coor_system.get_indecies_on_rotate(parameters)
         if (coordinates_of_intersection == -1):
             return 255*3*self.w1*self.h1*self.h2*self.w2
         #self.drawImage(SHIFT_X, SHIFT_Y, thetha,100)
         difference = np.square(np.subtract(self.canvas[coordinates_of_intersection[0]],self.canvas[coordinates_of_intersection[1]]))
         loss = np.mean(difference)
-        sys.stdout.write("\r    SHIFT_X:{0},    SHIFT_Y:{1},    Angle:{2},    Loss:{3}       ☚||||".format(SHIFT_X,SHIFT_Y,thetha,loss))
+        sys.stdout.write("\rLoss:{3}       ☚||||".format(loss))
         return loss
 
     def drawImage(self,X,Y, thetha,time):
@@ -86,12 +81,11 @@ class ImageStitcher:
         self.coor_system = CoordinateSystem((len(self.canvas[0])/2,len(self.canvas)/2))
 
     def run_nelder_mead(self,i,n):
-        x = random.uniform(0,1)
-        y = random.uniform(0,1)
-        thetha = random.uniform(0,1)
+        x0 = []
+        for i in range(12):
+            param = random.uniform(0,20)
+            x0.append(param)
         print("Iteration N: ",i+1,"/",n+1)
-        print("    Initial Values: ",x,"  ",y,"  ",thetha)
-        x0 = [x,y,thetha]
         res = minimize(self.calculateLoss,x0, method = 'nelder-mead', options={'disp':True})
         print("\n\n\n\n")
         return [res.fun,res.x]
