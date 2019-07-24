@@ -11,9 +11,11 @@ import matplotlib
 import math
 import numpy as np
 from joblib import Parallel, delayed
+from matplotlib.path import Path
+
 # import sys
 import time
-SAMPLING_RATE = 10
+SAMPLING_RATE = 5
 
 class CoordinateSystem:
     rectangle1 = []
@@ -28,27 +30,30 @@ class CoordinateSystem:
         # plt.clf()
         # plt.gca().invert_yaxis()
         self.rectangle1, self.rectangle2 = rectangles
-        rec1 = Polygon(self.rectangle1)	
-        rec2 = Polygon(self.rectangle2)	
+        # rec1 = Polygon(self.rectangle1)	
+        # rec2 = Polygon(self.rectangle2)	
         # x1, y1 =rec1.exterior.xy	
         # x2, y2 =rec2.exterior.xy	
         # plt.plot(x1, y1,color='yellow')
         # plt.plot(x2, y2,color='black')
         
-    def rotateElement(self,geometricFigure, thetha):
+    def rotateElement(self,geometricFigure, thethaInDeg):
         # Start = time.time()
-        # a = math.cos(thetha)
-        # b = math.sin(thetha)
+        thetha = thethaInDeg * math.pi/180
+        a = math.cos(thetha)
+        b = math.sin(thetha)
         centrex, centrey = Polygon(self.rectangle2).centroid.coords.xy
         centrex, centrey = centrex[0], centrey[0]
-        coords = np.array(geometricFigure.coords)
-        rotated = np.array([self.rotateTranslateCoordinates(tuple(point),centrex,centrey,thetha) for point in coords])
-        rotated = rotated.T
-        # rotated = rotate(geometricFigure, thetha,origin=(centrex,centrey))
-        # rotated = loads(dumps(rotated, rounding_precision=0))
+        x_off = centrex - centrex * a + centrey * b
+        y_off = centrey - centrex * b - centrey * a
+        M = [a, -b, b, a, x_off, y_off]
+
+        rotated = affine_transform(geometricFigure,M)
+        # rotated = rotate(geometricFigure,thethaInDeg,origin=Point(centrex,centrey))
+        rotated = loads(dumps(rotated, rounding_precision=0))
         # end = time.time()
         # print("Rotate line: ",end-Start,"\n\n" )
-        return rotated.astype(int)
+        return rotated
 
     def rotateTranslateCoordinates(self,coor,centreX,centreY,angle):
         X,Y = coor
@@ -92,33 +97,33 @@ class CoordinateSystem:
 
     def get_coordinates_in_polygon(self, polygon):
         #Start = time.time()
-        p1 = Polygon(self.rectangle1)
-        if (polygon.area <= p1.area*0.15):
-            return -1
-        coordinatesInPolygon = []
+        # p1 = Polygon(self.rectangle1)
+        # if (polygon.area <= p1.area*0.04):
+        #     return -1
+        polygon = loads(dumps(polygon, rounding_precision=0))
+        rectangle = list(polygon.exterior.coords)
         bounds = polygon.bounds
         height = int(bounds[3]) - int(bounds[1])
         width = int(bounds[2]) - int(bounds[0])
-        y_num_samples = round(height/100*SAMPLING_RATE)
-        x_num_samples = round(width/100*SAMPLING_RATE)
-        y_step = int(round(height/y_num_samples))
-        x_step = int(round(width/x_num_samples))
-        if (x_step<1):
-            x_step = 1
-        if (y_step<1):
-            y_step = 1
-        bounds = polygon.bounds
+        p = Path(rectangle)
+        x, y = np.meshgrid(np.arange(int(bounds[0]),int(bounds[2])), np.arange(int(bounds[1]),int(bounds[3]))) # make a canvas with coordinates
+        x, y = x.flatten(), y.flatten()
+        points = np.vstack((x,y)).T
 
-        for y in range(int(bounds[1]),int(bounds[3]),int(y_step)):
-            for x in range(int(bounds[0]),int(bounds[2]), int(x_step)):
-                point = Point(x,y)
-                if (point.within(polygon)):
-                    coordinatesInPolygon.append(point)
-        if (len(coordinatesInPolygon)<=3):
-            return -1
+        grid = p.contains_points(points)
+        mask = grid.reshape(width,height)
+        fig = plt.figure()
+        ax = fig.add_subplot(111)
+        ax.imshow(mask, aspect='auto', cmap=plt.cm.gray, interpolation='nearest')
+        fig.savefig("yo.png")
+        coords = np.nonzero(np.flip(mask,axis=0))
+        coords = np.array(coords)
+        coords[0] = coords[0]+int(bounds[0])
+        coords[1] = coords[1]+int(bounds[1])
+        coordsInTupples = list(tuple(map(tuple, coords.transpose())))
         #end = time.time()
         #print("geting the coornates: ",end-Start,"\n\n" )
-        return LineString(coordinatesInPolygon)
+        return LineString(coordsInTupples)
 
     def get_numpy_coords(self, shape):
         coordintes = np.array(shape.xy)
@@ -149,11 +154,12 @@ class CoordinateSystem:
         coordintes_of_intersection = self.get_coordinates_in_polygon(intersection)
         if coordintes_of_intersection == -1:
             return -1
-        numpy_coords_2 = self.rotateElement(coordintes_of_intersection,-thetha)
+        initialPolygon2 = self.rotateElement(coordintes_of_intersection,-thetha)
         initialPolygon1 = self.shiftAnElement(coordintes_of_intersection,SHIFT_X,SHIFT_Y)
         # x2, y2 =initialPolygon2.coords.xy	
         # plt.plot(x2, y2,color='blue')
         numpy_coords_1 = self.get_numpy_coords(initialPolygon1)
+        numpy_coords_2 = self.get_numpy_coords(initialPolygon2)
         coordinates_in_polygon1 = self.make_image_format_indexing(numpy_coords_1)
         coordinates_in_polygon2 = self.make_image_format_indexing(numpy_coords_2)
         coordinates_in_polygon1 = self.makeImageCoordinateFormat(coordinates_in_polygon1)
