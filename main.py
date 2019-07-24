@@ -20,7 +20,7 @@ class main:
     if __name__=='__main__':
         
         clearScreen()
-        img1 = cv2.imread('images/sea1.jpg')
-        img2 = cv2.imread('images/sea2.jpg')  
+        img1 = cv2.imread('images/Map1-rotate.png')
+        img2 = cv2.imread('images/Map2.png')  
         print("Starting the algorithm\n\n")
         mosaic2Images(img1,img2)

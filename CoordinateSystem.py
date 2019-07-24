@@ -112,10 +112,6 @@ class CoordinateSystem:
 
         grid = p.contains_points(points)
         mask = grid.reshape(width,height)
-        fig = plt.figure()
-        ax = fig.add_subplot(111)
-        ax.imshow(mask, aspect='auto', cmap=plt.cm.gray, interpolation='nearest')
-        fig.savefig("yo.png")
         coords = np.nonzero(np.flip(mask,axis=0))
         coords = np.array(coords)
         coords[0] = coords[0]+int(bounds[0])
