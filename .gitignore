@@ -1,2 +1,3 @@
 venv/
-__pyache__
+__pyache__/
+*.pyc
