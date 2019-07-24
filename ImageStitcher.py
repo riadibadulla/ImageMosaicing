@@ -31,11 +31,10 @@ class ImageStitcher:
         self.img2_canvas_size = int(math.sqrt(math.pow(self.h2,2)+math.pow(self.w2,2)))
         print("H1: ",self.h1,"  W1: ",self.w1,"\nH2: ",self.h2,"  W2: ",self.w2)
         
-    def getCornersOfImages(self,SHIFT):
+    def getCornersOfImages(self):
         y_OffsetIMG2 = int((self.img2_canvas_size-self.h2)/2)
         x_OffsetIMG2 = int((self.img2_canvas_size-self.w2)/2)
-        SHIFT_X,SHIFT_Y, thetha = SHIFT
-        rectangle1 = [(SHIFT_X,SHIFT_Y),(SHIFT_X,self.h1+SHIFT_Y),(self.w1+SHIFT_X,self.h1+SHIFT_Y),(self.w1+SHIFT_X,SHIFT_Y)]
+        rectangle1 = [(0,0),(0,self.h1),(self.w1,self.h1),(self.w1,0)]
         rectangle2 = [(self.w1+x_OffsetIMG2,self.h1+y_OffsetIMG2),(self.w1+x_OffsetIMG2,self.h1+y_OffsetIMG2+self.h2),
         (self.w1+x_OffsetIMG2+self.w2,self.h1+y_OffsetIMG2+self.h2),(self.w1+x_OffsetIMG2+self.w2,self.h1+y_OffsetIMG2)]
         return rectangle1,rectangle2
@@ -44,9 +43,10 @@ class ImageStitcher:
         SHIFT_X,SHIFT_Y, thetha = SHIFT
         SHIFT_X, SHIFT_Y, thetha = int(SHIFT_X*(self.w1+self.w2)),int(SHIFT_Y*(self.h1+self.h2)),int(thetha*360)
         # SHIFT_X, SHIFT_Y, thetha = int(SHIFT_X),int(SHIFT_Y),int(thetha)
+        sys.stdout.write("\r    SHIFT_X:{0},    SHIFT_Y:{1},    Angle:{2}    ☚||||".format(SHIFT_X,SHIFT_Y,thetha))
         if (SHIFT_X>=self.w1+self.img2_canvas_size-self.img2_canvas_size*0.05 or SHIFT_Y>=self.h1+self.img2_canvas_size-self.img2_canvas_size*0.05 or SHIFT_Y<self.img2_canvas_size*0.05 or SHIFT_X<self.img2_canvas_size*0.05):
             return 255*3*self.w1*self.h1*self.h2*self.w2
-        self.coor_system.set_rectangles(self.getCornersOfImages((SHIFT_X,SHIFT_Y, 360-thetha)))
+        self.coor_system.set_rectangles(self.getCornersOfImages())
         coordinates_of_intersection = self.coor_system.get_indecies_on_rotate(SHIFT_X, SHIFT_Y,thetha)
         if (coordinates_of_intersection == -1):
             return 255*3*self.w1*self.h1*self.h2*self.w2

@@ -21,6 +21,8 @@ class CoordinateSystem:
     rectangle1 = []
     rectangle2 = []
     centreOfRectangle2 = None
+    polygon1 = None
+    polygon2 = None
 
     def __init__(self,centre):
         self.centreOfRectangle2 = centre
@@ -30,6 +32,8 @@ class CoordinateSystem:
         # plt.clf()
         # plt.gca().invert_yaxis()
         self.rectangle1, self.rectangle2 = rectangles
+        self.polygon1 = Polygon(self.rectangle1)
+        self.polygon2 = Polygon(self.rectangle2)
         # rec1 = Polygon(self.rectangle1)	
         # rec2 = Polygon(self.rectangle2)	
         # x1, y1 =rec1.exterior.xy	
@@ -54,40 +58,23 @@ class CoordinateSystem:
         # end = time.time()
         # print("Rotate line: ",end-Start,"\n\n" )
         return rotated
-
-    def rotateTranslateCoordinates(self,coor,centreX,centreY,angle):
-        X,Y = coor
-        tempX = X - centreX
-        tempY = Y - centreY
-        rotatedX = tempX*math.cos(angle * math.pi/180) - tempY*math.sin(angle * math.pi/180)
-        rotatedY = tempX*math.sin(angle * math.pi/180) + tempY*math.cos(angle * math.pi/180)
-        x = rotatedX + centreX
-        y = rotatedY + centreY
-        return x,y
-
-    def rotateCornersOfImage2(self,angle):
-        # Start = time.time()
-        newRectangle = []
-        for coor in self.rectangle2:
-            newCorner = self.rotateTranslateCoordinates(coor,self.centreOfRectangle2[0],self.centreOfRectangle2[1],angle)
-            newRectangle.append(newCorner)
-        self.rectangle2 = newRectangle
-        # end = time.time()
-        # print("rotate corners: ",end-Start,"\n\n" )
     
     def shiftAnElement(self,geometric_figure, SHIFT_X,SHIFT_Y):
-        M = [1,0,0,1,-SHIFT_X,-SHIFT_Y]
+        M = [1,0,0,1,SHIFT_X,SHIFT_Y]
         rotated = affine_transform(geometric_figure,M)
         rotated = loads(dumps(rotated, rounding_precision=0))
         # x,y = rotated.coords.xy
         # plt.plot(x,y,color='magenta')
         return rotated
 
+    def transform(self,M,shape):
+        return affine_transform(shape,M)
+
     def get_intersection_polygon(self):
         # Start = time.time()
-        p1 = Polygon(self.rectangle1)
+        p1 = self.polygon1
         x1,y1= p1.exterior.xy
-        p2 = Polygon(self.rectangle2)
+        p2 = self.polygon2
         p2 = loads(dumps(p2, rounding_precision=0))
         x2,y2= p2.exterior.xy
         intersection = p1.intersection(p2)
@@ -97,9 +84,9 @@ class CoordinateSystem:
 
     def get_coordinates_in_polygon(self, polygon):
         #Start = time.time()
-        # p1 = Polygon(self.rectangle1)
-        # if (polygon.area <= p1.area*0.04):
-        #     return -1
+        p1 = Polygon(self.rectangle1)
+        if (polygon.area <= p1.area*0.04):
+            return -1
         polygon = loads(dumps(polygon, rounding_precision=0))
         rectangle = list(polygon.exterior.coords)
         bounds = polygon.bounds
@@ -139,7 +126,8 @@ class CoordinateSystem:
 
     def get_indecies_on_rotate(self, SHIFT_X, SHIFT_Y, thetha):
         if (thetha != 0):
-            self.rotateCornersOfImage2(thetha)
+            self.polygon2 = self.rotateElement(self.polygon2,thetha)
+        self.polygon1 = self.shiftAnElement(self.polygon1,SHIFT_X,SHIFT_Y)
         # x2, y2 =Polygon(self.rectangle2).exterior.xy	
         # plt.plot(x2, y2,color='red')
         intersection = self.get_intersection_polygon()
@@ -151,7 +139,7 @@ class CoordinateSystem:
         if coordintes_of_intersection == -1:
             return -1
         initialPolygon2 = self.rotateElement(coordintes_of_intersection,-thetha)
-        initialPolygon1 = self.shiftAnElement(coordintes_of_intersection,SHIFT_X,SHIFT_Y)
+        initialPolygon1 = self.shiftAnElement(coordintes_of_intersection,-SHIFT_X,-SHIFT_Y)
         # x2, y2 =initialPolygon2.coords.xy	
         # plt.plot(x2, y2,color='blue')
         numpy_coords_1 = self.get_numpy_coords(initialPolygon1)
