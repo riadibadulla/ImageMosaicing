@@ -35,38 +35,20 @@ class CoordinateSystem:
         self.canvas = Polygon(corners)
 
     def set_rectangles(self,rectangles):
-        # plt.clf()
-        # plt.gca().invert_yaxis()
+        plt.clf()
+        plt.gca().invert_yaxis()
         self.rectangle1, self.rectangle2 = rectangles
         self.polygon1 = Polygon(self.rectangle1)
         self.polygon2 = Polygon(self.rectangle2)
-        # rec1 = Polygon(self.rectangle1)	
-        # rec2 = Polygon(self.rectangle2)	
-        # x1, y1 =rec1.exterior.xy	
-        # x2, y2 =rec2.exterior.xy	
-        # plt.plot(x1, y1,color='yellow')
-        # plt.plot(x2, y2,color='black')
+        rec1 = Polygon(self.rectangle1)	
+        rec2 = Polygon(self.rectangle2)	
+        x1, y1 =rec1.exterior.xy	
+        x2, y2 =rec2.exterior.xy	
+        plt.plot(x1, y1,color='yellow')
+        plt.plot(x2, y2,color='black')
         
     def satisfaction_test(self):
         return (self.polygon1.within(self.canvas) and self.polygon2.within(self.canvas))
-
-    def rotateElement(self,geometricFigure, thethaInDeg):
-        # Start = time.time()
-        thetha = thethaInDeg * math.pi/180
-        a = math.cos(thetha)
-        b = math.sin(thetha)
-        centrex, centrey = Polygon(self.rectangle2).centroid.coords.xy
-        centrex, centrey = centrex[0], centrey[0]
-        x_off = centrex - centrex * a + centrey * b
-        y_off = centrey - centrex * b - centrey * a
-        M = [a, -b, b, a, x_off, y_off]
-
-        rotated = affine_transform(geometricFigure,M)
-        # rotated = rotate(geometricFigure,thethaInDeg,origin=Point(centrex,centrey))
-        rotated = loads(dumps(rotated, rounding_precision=0))
-        # end = time.time()
-        # print("Rotate line: ",end-Start,"\n\n" )
-        return rotated
     
     def get_inverse_matrix(self,M):
         M_matrix = [[M[0],M[1],M[4]],[M[2],M[3],M[5]],[0,0,1]]
@@ -93,8 +75,8 @@ class CoordinateSystem:
     def get_coordinates_in_polygon(self, polygon):
         #Start = time.time()
         p1 = Polygon(self.rectangle1)
-        if (polygon.area <= p1.area*0.04):
-            return -1
+        # if (polygon.area <= p1.area*0.04):
+        #     return -1
         polygon = loads(dumps(polygon, rounding_precision=0))
         rectangle = list(polygon.exterior.coords)
         bounds = polygon.bounds
@@ -143,7 +125,7 @@ class CoordinateSystem:
 
         x_off = centrex - centrex * r_cos + centrey * r_sin + t_x
         y_off = centrey - centrex * r_sin - centrey * r_cos + t_y
-        M = [a*r_cos, -b*r_cos, c*r_sin, d*r_cos, x_off, y_off]
+        M = [a*r_cos, -b*r_sin, c*r_sin, d*r_cos, x_off, y_off]
         return M
 
     def get_indecies_on_rotate(self, parameters):
@@ -152,28 +134,40 @@ class CoordinateSystem:
         M2 = self.construct_transformation_matrix((a1,b1,c1,d1,thetha1,t_x1,t_y1),self.polygon2)
         self.polygon1 = self.transform(M1,self.polygon1)
         self.polygon2 = self.transform(M2,self.polygon2)
-        if (not self.satisfaction_test()):
-            return -1
-        # x2, y2 =Polygon(self.rectangle2).exterior.xy	
-        # plt.plot(x2, y2,color='red')
+        # if (not self.satisfaction_test()):
+        #     plt.axis('equal')
+        #     plt.savefig("polygon.png")
+        #     return -1
+        x2, y2 =self.polygon2.exterior.xy	
+        plt.plot(x2, y2,color='red')
+        x2, y2 =self.polygon1.exterior.xy	
+        plt.plot(x2, y2,color='grey')
         intersection = self.get_intersection_polygon()
         if (intersection.area == 0.0):
+            plt.axis('equal')
+            plt.savefig("polygon.png")
             return -1
-        # x2, y2 =intersection.exterior.xy	
-        # plt.plot(x2, y2,color='green')
+        x2, y2 =intersection.exterior.xy	
+        plt.plot(x2, y2,color='green')
         coordintes_of_intersection = self.get_coordinates_in_polygon(intersection)
+        x,y = coordintes_of_intersection.coords.xy
+        plt.plot(x,y,color='green')
         if coordintes_of_intersection == -1:
+            plt.axis('equal')
+            plt.savefig("polygon.png")
             return -1
         initialPolygon2 = self.transform(self.get_inverse_matrix(M2),coordintes_of_intersection)
         initialPolygon1 = self.transform(self.get_inverse_matrix(M1),coordintes_of_intersection)
-        # x2, y2 =initialPolygon2.coords.xy	
-        # plt.plot(x2, y2,color='blue')
+        x2, y2 =initialPolygon2.coords.xy	
+        plt.plot(x2, y2,color='blue')
+        x2, y2 =initialPolygon1.coords.xy	
+        plt.plot(x2, y2,color='blue')
         numpy_coords_1 = self.get_numpy_coords(initialPolygon1)
         numpy_coords_2 = self.get_numpy_coords(initialPolygon2)
         coordinates_in_polygon1 = self.make_image_format_indexing(numpy_coords_1)
         coordinates_in_polygon2 = self.make_image_format_indexing(numpy_coords_2)
         coordinates_in_polygon1 = self.makeImageCoordinateFormat(coordinates_in_polygon1)
         coordinates_in_polygon2 = self.makeImageCoordinateFormat(coordinates_in_polygon2)
-        # plt.axis('equal')
-        # plt.savefig("polygon.png")
+        plt.axis('equal')
+        plt.savefig("polygon.png")
         return (coordinates_in_polygon1, coordinates_in_polygon2)

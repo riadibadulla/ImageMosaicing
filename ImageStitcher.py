@@ -153,3 +153,12 @@ class ImageStitcher:
         self.BestX = int(savedParameters[1][minimumErrorIndex][0]*(self.w1+self.w2))
         self.BestY = int(savedParameters[1][minimumErrorIndex][1]*(self.h1+self.h2))
         self.Best_Rotate = int(savedParameters[1][minimumErrorIndex][2]*360)
+    
+    def test_one_iter(self, x0):
+        print("\n\n\n")
+        self.set_canvas()
+        h,w = self.canvas.shape[:2]
+        savedParameters = [[],[]]
+        print("Iteration N: ",1,"/",1)
+        loss = self.calculateLoss(x0)
+        print(loss)
