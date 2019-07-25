@@ -23,11 +23,17 @@ class CoordinateSystem:
     centreOfRectangle2 = None
     polygon1 = None
     polygon2 = None
+    canvas = None
 
     def __init__(self,centre):
         self.centreOfRectangle2 = centre
         CAP_STYLE.flat
     
+    def set_canvas(self,size):
+        h,w = size
+        corners = [(0,0),(w-5,0),(w-5,h-5),(0,h-5)]
+        self.canvas = Polygon(corners)
+
     def set_rectangles(self,rectangles):
         # plt.clf()
         # plt.gca().invert_yaxis()
@@ -41,6 +47,9 @@ class CoordinateSystem:
         # plt.plot(x1, y1,color='yellow')
         # plt.plot(x2, y2,color='black')
         
+    def satisfaction_test(self):
+        return (self.polygon1.within(self.canvas) and self.polygon2.within(self.canvas))
+
     def rotateElement(self,geometricFigure, thethaInDeg):
         # Start = time.time()
         thetha = thethaInDeg * math.pi/180
@@ -65,14 +74,6 @@ class CoordinateSystem:
         np_matrix_inverse = np.array(np_matrix.I)
         M_inverse = [np_matrix_inverse[0][0],np_matrix_inverse[0][1],np_matrix_inverse[1][0],np_matrix_inverse[1][1],np_matrix_inverse[0][2],np_matrix_inverse[1][2]]
         return M_inverse
-
-    def shiftAnElement(self,geometric_figure, SHIFT_X,SHIFT_Y):
-        M = [1,0,0,1,SHIFT_X,SHIFT_Y]
-        rotated = affine_transform(geometric_figure,M)
-        rotated = loads(dumps(rotated, rounding_precision=0))
-        # x,y = rotated.coords.xy
-        # plt.plot(x,y,color='magenta')
-        return rotated
 
     def transform(self,M,shape):
         return affine_transform(shape,M)
@@ -131,12 +132,28 @@ class CoordinateSystem:
     def makeImageCoordinateFormat(self,new_format):
         return (new_format[1],new_format[0],new_format[2])
 
+    def construct_transformation_matrix(self,parameters,polygon):
+        a,b,c,d,thetha_degrees,t_x,t_y = parameters
+        thetha = thetha_degrees * math.pi/180
+        r_cos = math.cos(thetha)
+        r_sin = math.sin(thetha)
+
+        centrex, centrey = polygon.centroid.coords.xy
+        centrex, centrey = centrex[0], centrey[0]
+
+        x_off = centrex - centrex * r_cos + centrey * r_sin + t_x
+        y_off = centrey - centrex * r_sin - centrey * r_cos + t_y
+        M = [a*r_cos, -b*r_cos, c*r_sin, d*r_cos, x_off, y_off]
+        return M
+
     def get_indecies_on_rotate(self, parameters):
-        a,b,c,d,e,f,a1,b1,c1,d1,e1,f1 = parameters
-        M1 = [a,b,c,d,e,f]
-        M2 = [a1,b1,c1,d1,e1,f1]
+        a,b,c,d,thetha,t_x,t_y, a1,b1,c1,d1,thetha1,t_x1,t_y1  = parameters
+        M1 = self.construct_transformation_matrix((a,b,c,d,thetha,t_x,t_y),self.polygon1)
+        M2 = self.construct_transformation_matrix((a1,b1,c1,d1,thetha1,t_x1,t_y1),self.polygon2)
         self.polygon1 = self.transform(M1,self.polygon1)
         self.polygon2 = self.transform(M2,self.polygon2)
+        if (not self.satisfaction_test()):
+            return -1
         # x2, y2 =Polygon(self.rectangle2).exterior.xy	
         # plt.plot(x2, y2,color='red')
         intersection = self.get_intersection_polygon()
@@ -147,8 +164,8 @@ class CoordinateSystem:
         coordintes_of_intersection = self.get_coordinates_in_polygon(intersection)
         if coordintes_of_intersection == -1:
             return -1
-        initialPolygon2 = self.transform(coordintes_of_intersection,self.get_inverse_matrix(M2))
-        initialPolygon1 = self.transform(coordintes_of_intersection,self.get_inverse_matrix(M1))
+        initialPolygon2 = self.transform(self.get_inverse_matrix(M2),coordintes_of_intersection)
+        initialPolygon1 = self.transform(self.get_inverse_matrix(M1),coordintes_of_intersection)
         # x2, y2 =initialPolygon2.coords.xy	
         # plt.plot(x2, y2,color='blue')
         numpy_coords_1 = self.get_numpy_coords(initialPolygon1)
