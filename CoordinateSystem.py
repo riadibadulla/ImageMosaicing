@@ -35,6 +35,7 @@ class CoordinateSystem:
         self.canvas = Polygon(corners)
 
     def set_rectangles(self,rectangles):
+        plt.figure(figsize=(9,9))
         plt.clf()
         plt.gca().invert_yaxis()
         self.rectangle1, self.rectangle2 = rectangles
@@ -79,20 +80,18 @@ class CoordinateSystem:
         #     return -1
         polygon = loads(dumps(polygon, rounding_precision=0))
         rectangle = list(polygon.exterior.coords)
-        bounds = polygon.bounds
+        bounds = self.canvas.bounds
         height = int(bounds[3]) - int(bounds[1])
         width = int(bounds[2]) - int(bounds[0])
         p = Path(rectangle)
-        x, y = np.meshgrid(np.arange(int(bounds[0]),int(bounds[2])), np.arange(int(bounds[1]),int(bounds[3]))) # make a canvas with coordinates
+        x, y = np.meshgrid(np.arange(1000), np.arange(1000)) # make a canvas with coordinates
         x, y = x.flatten(), y.flatten()
-        points = np.vstack((x,y)).T
+        points = np.vstack((y,x)).T
 
         grid = p.contains_points(points)
-        mask = grid.reshape(width,height)
-        coords = np.nonzero(np.flip(mask,axis=0))
+        mask = grid.reshape(1000,1000)
+        coords = np.nonzero(mask)
         coords = np.array(coords)
-        coords[0] = coords[0]+int(bounds[0])
-        coords[1] = coords[1]+int(bounds[1])
         coordsInTupples = list(tuple(map(tuple, coords.transpose())))
         #end = time.time()
         #print("geting the coornates: ",end-Start,"\n\n" )
@@ -147,8 +146,6 @@ class CoordinateSystem:
             plt.axis('equal')
             plt.savefig("polygon.png")
             return -1
-        x2, y2 =intersection.exterior.xy	
-        plt.plot(x2, y2,color='green')
         coordintes_of_intersection = self.get_coordinates_in_polygon(intersection)
         x,y = coordintes_of_intersection.coords.xy
         plt.plot(x,y,color='green')
@@ -169,5 +166,7 @@ class CoordinateSystem:
         coordinates_in_polygon1 = self.makeImageCoordinateFormat(coordinates_in_polygon1)
         coordinates_in_polygon2 = self.makeImageCoordinateFormat(coordinates_in_polygon2)
         plt.axis('equal')
-        plt.savefig("polygon.png")
+        plt.legend(['Image1','Image2','Transformed image2','Transformed image1', 'Intersection','Intersection coordinates inverted back'], loc='best')
+        plt.title("Obtaining the coordinates")
+        plt.savefig("polygon.png", dpi=700)
         return (coordinates_in_polygon1, coordinates_in_polygon2)
