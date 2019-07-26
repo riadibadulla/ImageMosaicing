@@ -35,18 +35,18 @@ class CoordinateSystem:
         self.canvas = Polygon(corners)
 
     def set_rectangles(self,rectangles):
-        plt.figure(figsize=(9,9))
-        plt.clf()
-        plt.gca().invert_yaxis()
+        # plt.figure(figsize=(9,9))
+        # plt.clf()
+        # plt.gca().invert_yaxis()
         self.rectangle1, self.rectangle2 = rectangles
         self.polygon1 = Polygon(self.rectangle1)
         self.polygon2 = Polygon(self.rectangle2)
-        rec1 = Polygon(self.rectangle1)	
-        rec2 = Polygon(self.rectangle2)	
-        x1, y1 =rec1.exterior.xy	
-        x2, y2 =rec2.exterior.xy	
-        plt.plot(x1, y1,color='yellow')
-        plt.plot(x2, y2,color='black')
+        # rec1 = Polygon(self.rectangle1)	
+        # rec2 = Polygon(self.rectangle2)	
+        # x1, y1 =rec1.exterior.xy	
+        # x2, y2 =rec2.exterior.xy	
+        # plt.plot(x1, y1,color='yellow')
+        # plt.plot(x2, y2,color='black')
         
     def satisfaction_test(self):
         return (self.polygon1.within(self.canvas) and self.polygon2.within(self.canvas))
@@ -134,39 +134,34 @@ class CoordinateSystem:
         self.polygon1 = self.transform(M1,self.polygon1)
         self.polygon2 = self.transform(M2,self.polygon2)
         # if (not self.satisfaction_test()):
-        #     plt.axis('equal')
-        #     plt.savefig("polygon.png")
         #     return -1
-        x2, y2 =self.polygon2.exterior.xy	
-        plt.plot(x2, y2,color='red')
-        x2, y2 =self.polygon1.exterior.xy	
-        plt.plot(x2, y2,color='grey')
+        # x2, y2 =self.polygon2.exterior.xy	
+        # plt.plot(x2, y2,color='red')
+        # x2, y2 =self.polygon1.exterior.xy	
+        # plt.plot(x2, y2,color='grey')
         intersection = self.get_intersection_polygon()
         if (intersection.area == 0.0):
-            plt.axis('equal')
-            plt.savefig("polygon.png")
             return -1
         coordintes_of_intersection = self.get_coordinates_in_polygon(intersection)
-        x,y = coordintes_of_intersection.coords.xy
-        plt.plot(x,y,color='green')
+        # x,y = coordintes_of_intersection.coords.xy
+        # plt.plot(x,y,color='green')
         if coordintes_of_intersection == -1:
-            plt.axis('equal')
-            plt.savefig("polygon.png")
             return -1
         initialPolygon2 = self.transform(self.get_inverse_matrix(M2),coordintes_of_intersection)
         initialPolygon1 = self.transform(self.get_inverse_matrix(M1),coordintes_of_intersection)
-        x2, y2 =initialPolygon2.coords.xy	
-        plt.plot(x2, y2,color='blue')
-        x2, y2 =initialPolygon1.coords.xy	
-        plt.plot(x2, y2,color='blue')
+        # x2, y2 =initialPolygon2.coords.xy	
+        # plt.plot(x2, y2,color='blue')
+        # x2, y2 =initialPolygon1.coords.xy	
+        # plt.plot(x2, y2,color='blue')
         numpy_coords_1 = self.get_numpy_coords(initialPolygon1)
         numpy_coords_2 = self.get_numpy_coords(initialPolygon2)
+
         coordinates_in_polygon1 = self.make_image_format_indexing(numpy_coords_1)
         coordinates_in_polygon2 = self.make_image_format_indexing(numpy_coords_2)
         coordinates_in_polygon1 = self.makeImageCoordinateFormat(coordinates_in_polygon1)
         coordinates_in_polygon2 = self.makeImageCoordinateFormat(coordinates_in_polygon2)
-        plt.axis('equal')
-        plt.legend(['Image1','Image2','Transformed image2','Transformed image1', 'Intersection','Intersection coordinates inverted back'], loc='best')
-        plt.title("Obtaining the coordinates")
-        plt.savefig("polygon.png", dpi=700)
+        # plt.axis('equal')
+        # plt.legend(['Image1','Image2','Transformed image2','Transformed image1', 'Intersection','Intersection coordinates inverted back'], loc='best')
+        # plt.title("Obtaining the coordinates")
+        # plt.savefig("polygon.png", dpi=700)
         return (coordinates_in_polygon1, coordinates_in_polygon2)

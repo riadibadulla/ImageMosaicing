@@ -40,7 +40,7 @@ class ImageStitcher:
         return rectangle1,rectangle2
 
     def calculateLoss(self,parameters):
-        # SHIFT_X, SHIFT_Y, thetha = int(SHIFT_X),int(SHIFT_Y),int(thetha)
+        print(parameters)
         self.coor_system.set_rectangles(self.getCornersOfImages())
         self.coor_system.set_canvas(self.canvas.shape[:2])
         coordinates_of_intersection = self.coor_system.get_indecies_on_rotate(parameters)
