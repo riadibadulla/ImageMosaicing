@@ -133,14 +133,14 @@ class CoordinateSystem:
         M2 = self.construct_transformation_matrix((a1,b1,c1,d1,thetha1,t_x1,t_y1),self.polygon2)
         self.polygon1 = self.transform(M1,self.polygon1)
         self.polygon2 = self.transform(M2,self.polygon2)
-        # if (not self.satisfaction_test()):
-        #     return -1
+        if (not self.satisfaction_test()):
+            return -1
         # x2, y2 =self.polygon2.exterior.xy	
         # plt.plot(x2, y2,color='red')
         # x2, y2 =self.polygon1.exterior.xy	
         # plt.plot(x2, y2,color='grey')
         intersection = self.get_intersection_polygon()
-        if (intersection.area == 0.0):
+        if (intersection.area < 5.0):
             return -1
         coordintes_of_intersection = self.get_coordinates_in_polygon(intersection)
         # x,y = coordintes_of_intersection.coords.xy

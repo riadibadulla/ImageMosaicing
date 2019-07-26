@@ -14,11 +14,9 @@ class ImageStitcher:
     img2 = None
     img2_canvas_size = None
     h1,h2,w1,w2 = 0,0,0,0
-    BestX = 1
-    BestY = 1
-    Best_Rotate = 1
     canvas = None
     coor_system = None
+    best_parameters = []
 
     def __init__(self, img1, img2, resize):
         self.img1 = img1
@@ -39,8 +37,20 @@ class ImageStitcher:
         (self.w1+x_OffsetIMG2+self.w2,self.h1+y_OffsetIMG2+self.h2),(self.w1+x_OffsetIMG2+self.w2,self.h1+y_OffsetIMG2)]
         return rectangle1,rectangle2
 
+    def unnormalise(self, parameters):
+        a,b,c,d,thetha,t_x,t_y, a1,b1,c1,d1,thetha1,t_x1,t_y1 = parameters
+        a,a1 = a *1.1 +0.7, a1 *1.1 +0.7
+        b,b1 = b *1.1 +0.7, b1 *1.1 +0.7
+        c,c1 = c *1.1 +0.7, c1 *1.1 +0.7
+        d,d1 = d *1.1 +0.7, d1 *1.1 +0.7
+        thetha, thetha1 = thetha*360, thetha1*360
+        h,w = self.canvas.shape[:2]
+        t_x, t_x1 = t_x*w, t_x1*w
+        t_y, t_y1 = t_y*h, t_y1*h
+        return [a,b,c,d,thetha,t_x,t_y, a1,b1,c1,d1,thetha1,t_x1,t_y1]
+
     def calculateLoss(self,parameters):
-        print(parameters)
+        parameters = self.unnormalise(parameters)
         self.coor_system.set_rectangles(self.getCornersOfImages())
         self.coor_system.set_canvas(self.canvas.shape[:2])
         coordinates_of_intersection = self.coor_system.get_indecies_on_rotate(parameters)
@@ -48,11 +58,11 @@ class ImageStitcher:
             return 255*3*self.w1*self.h1*self.h2*self.w2
         difference = np.square(np.subtract(self.canvas[coordinates_of_intersection[0]],self.canvas[coordinates_of_intersection[1]]))
         loss = np.mean(difference)
-        #sys.stdout.write("\rLoss:{3}       ☚||||".format(loss))
-        print(loss)
+        sys.stdout.write("\r Loss:{0}       ☚||||".format(loss))
         return loss
 
     def drawImage(self,param,time):
+        param = self.unnormalise(param)
         a,b,c,d,thetha,t_x,t_y, a1,b1,c1,d1,thetha1,t_x1,t_y1 = param
         thetha = thetha * math.pi/180
         thetha1 = thetha1 * math.pi/180
@@ -129,13 +139,9 @@ class ImageStitcher:
         savedParameters = [[],[]]
         for i in range(n):
             x0 = []
-            for k in range(2):
-                for j in range(4):
-                    param = random.uniform(0.4,1.8)
-                    x0.append(param)
-                x0.append(random.uniform(0,360))
-                x0.append(random.uniform(0,w-5))
-                x0.append(random.uniform(0,h-5))
+            for j in range(14):
+                param = random.uniform(0,1)
+                x0.append(param)
             print("Iteration N: ",i+1,"/",n+1)
             res = minimize(self.calculateLoss,x0, method = 'nelder-mead', options={'disp':True})
             savedParameters[0].append(res.fun)
@@ -147,12 +153,8 @@ class ImageStitcher:
         print("\n\n\n\n\n\n")
         print("Error Index: ",minimumErrorIndex)
         print("Minimum Loss: ",savedParameters[0][minimumErrorIndex])
-        print("Shift_X: ",savedParameters[1][minimumErrorIndex][0]*(self.w1+self.w2))
-        print("Shift_Y: ",savedParameters[1][minimumErrorIndex][1]*(self.w1+self.w2))
-        print("Thetha: ",savedParameters[1][minimumErrorIndex][2]*360)
-        self.BestX = int(savedParameters[1][minimumErrorIndex][0]*(self.w1+self.w2))
-        self.BestY = int(savedParameters[1][minimumErrorIndex][1]*(self.h1+self.h2))
-        self.Best_Rotate = int(savedParameters[1][minimumErrorIndex][2]*360)
+        print("Parameters ",savedParameters[1])
+        self.best_parameters = savedParameters[1][minimumErrorIndex]
     
     def test_one_iter(self, x0):
         print("\n\n\n")
