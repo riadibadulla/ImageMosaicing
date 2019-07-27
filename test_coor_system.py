@@ -4,9 +4,14 @@ import cv2
 img1 = cv2.imread('images/Map1-rotate.png')
 img2 = cv2.imread('images/Map2.png')  
 
-x0 = [1,2,2,1,0,120,100,1,1,1,1,-45,0,0]
+x0 = [0.67811993, 0.46246523, 0.2639719 , 0.05067076, 0.01803103, 0.12002536,
+ 0.58894882 ,0.71443625 ,0.66426334 ,0.38575423, 0.29171836, 0.56493315,
+ 0.187759,   0.26246541]
+
 stitcher =ImageStitcher(img1,img2,False)
+stitcher.set_canvas()
 stitcher.test_one_iter(x0)
+stitcher.drawImage(x0,0)
 
 
 

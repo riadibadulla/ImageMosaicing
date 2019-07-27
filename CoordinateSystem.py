@@ -76,20 +76,20 @@ class CoordinateSystem:
     def get_coordinates_in_polygon(self, polygon):
         #Start = time.time()
         p1 = Polygon(self.rectangle1)
-        # if (polygon.area <= p1.area*0.04):
-        #     return -1
+        if (polygon.area <= p1.area*0.04):
+            return -1
         polygon = loads(dumps(polygon, rounding_precision=0))
         rectangle = list(polygon.exterior.coords)
         bounds = self.canvas.bounds
         height = int(bounds[3]) - int(bounds[1])
         width = int(bounds[2]) - int(bounds[0])
         p = Path(rectangle)
-        x, y = np.meshgrid(np.arange(1000), np.arange(1000)) # make a canvas with coordinates
+        x, y = np.meshgrid(np.arange(height), np.arange(width)) # make a canvas with coordinates
         x, y = x.flatten(), y.flatten()
         points = np.vstack((y,x)).T
 
         grid = p.contains_points(points)
-        mask = grid.reshape(1000,1000)
+        mask = grid.reshape(width,height)
         coords = np.nonzero(mask)
         coords = np.array(coords)
         coordsInTupples = list(tuple(map(tuple, coords.transpose())))
@@ -155,7 +155,6 @@ class CoordinateSystem:
         # plt.plot(x2, y2,color='blue')
         numpy_coords_1 = self.get_numpy_coords(initialPolygon1)
         numpy_coords_2 = self.get_numpy_coords(initialPolygon2)
-
         coordinates_in_polygon1 = self.make_image_format_indexing(numpy_coords_1)
         coordinates_in_polygon2 = self.make_image_format_indexing(numpy_coords_2)
         coordinates_in_polygon1 = self.makeImageCoordinateFormat(coordinates_in_polygon1)

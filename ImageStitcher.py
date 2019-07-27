@@ -50,15 +50,15 @@ class ImageStitcher:
         return [a,b,c,d,thetha,t_x,t_y, a1,b1,c1,d1,thetha1,t_x1,t_y1]
 
     def calculateLoss(self,parameters):
+        #sys.stdout.write("\r Parameters:{0}      ☚||||".format(parameters[:]))
         parameters = self.unnormalise(parameters)
         self.coor_system.set_rectangles(self.getCornersOfImages())
-        self.coor_system.set_canvas(self.canvas.shape[:2])
         coordinates_of_intersection = self.coor_system.get_indecies_on_rotate(parameters)
         if (coordinates_of_intersection == -1):
             return 255*3*self.w1*self.h1*self.h2*self.w2
         difference = np.square(np.subtract(self.canvas[coordinates_of_intersection[0]],self.canvas[coordinates_of_intersection[1]]))
         loss = np.mean(difference)
-        sys.stdout.write("\r Loss:{0}       ☚||||".format(loss))
+        sys.stdout.write("\r  Loss:{0}       ☚||||".format(loss))
         return loss
 
     def drawImage(self,param,time):
@@ -94,7 +94,8 @@ class ImageStitcher:
         vis1 = cv2.warpPerspective(vis1,M1,(w,h))
         M2 = np.float32([[a1*r_cos1,-b1*r_sin1, x_off1],[c1*r_sin1,d1*r_cos1,y_off1],[0,0,1]])
         vis2 =cv2.warpPerspective(vis2,M2,(w,h))
-        added_image = cv2.addWeighted(vis1,1,vis2,1,0)
+        vis1_without2 = cv2.subtract(vis1,vis2)
+        added_image = cv2.addWeighted(vis1_without2,1,vis2,1,0)
 
         cv2.imwrite("output.jpg",added_image)
         cv2.imshow('image',added_image)
@@ -121,6 +122,7 @@ class ImageStitcher:
         :3] = self.img2
         self.canvas[:self.h1,:self.w1,:3] = self.img1
         self.coor_system = CoordinateSystem((len(self.canvas[0])/2,len(self.canvas)/2))
+        self.coor_system.set_canvas(self.canvas.shape[:2])
 
     def run_nelder_mead(self,i,n):
         x0 = []
@@ -142,7 +144,7 @@ class ImageStitcher:
             for j in range(14):
                 param = random.uniform(0,1)
                 x0.append(param)
-            print("Iteration N: ",i+1,"/",n+1)
+            print("Iteration N: ",i+1,"/",n)
             res = minimize(self.calculateLoss,x0, method = 'nelder-mead', options={'disp':True})
             savedParameters[0].append(res.fun)
             savedParameters[1].append(res.x)
@@ -153,7 +155,7 @@ class ImageStitcher:
         print("\n\n\n\n\n\n")
         print("Error Index: ",minimumErrorIndex)
         print("Minimum Loss: ",savedParameters[0][minimumErrorIndex])
-        print("Parameters ",savedParameters[1])
+        print("Parameters ",savedParameters[1][minimumErrorIndex])
         self.best_parameters = savedParameters[1][minimumErrorIndex]
     
     def test_one_iter(self, x0):
