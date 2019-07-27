@@ -3,13 +3,14 @@ import numpy as np
 import time 
 from ImageStitcher import ImageStitcher
 import os
+import sys
 
 class main:
 
-    def mosaic2Images(img1,img2):
+    def mosaic2Images(img1,img2,iterations):
         START_TIME = time.time()
         mosaic = ImageStitcher(img1.copy(),img2.copy(),False)
-        mosaic.mosaicImages(3500)
+        mosaic.mosaicImages(iterations)
         END_TIME = time.time()
         print("Time taken: ", format(END_TIME - START_TIME), " seconds")
         mosaic.drawImage(mosaic.best_parameters,0)
@@ -18,9 +19,12 @@ class main:
         os.system('clear')
 
     if __name__=='__main__':
-        
         clearScreen()
-        img1 = cv2.imread('images/file.jpg')
-        img2 = cv2.imread('images/file1.jpg')  
+        arguments = sys.argv
+        image1_name = 'images/' + arguments[1]
+        image2_name = 'images/' + arguments[2]
+        number_of_iterations = int(arguments[3])
+        img1 = cv2.imread(image1_name)
+        img2 = cv2.imread(image2_name)  
         print("Starting the algorithm\n\n")
-        mosaic2Images(img1,img2)
+        mosaic2Images(img1,img2,number_of_iterations)
