@@ -143,8 +143,8 @@ class ImageStitcher:
         for j in range(5):
             sys.stdout.write("\033[F")
         for j in range(5):
-            print("                                                                                           \n")
-        for j in range(7):
+            print("                                                                                           ")
+        for j in range(5):
             sys.stdout.write("\033[F") 
 
     def mosaicImages(self,n):
@@ -156,7 +156,7 @@ class ImageStitcher:
         while (i<n):
             x0 = [random.uniform(0,1) for j in range(14)]
             print("Iteration N: ",i+1,"/",n)
-            res = minimize(self.calculateLoss,x0, method = 'nelder-mead', options={'disp':True, 'maxiter':100, 'adaptive':True})
+            res = minimize(self.calculateLoss,x0, method = 'nelder-mead', options={'disp':True, 'adaptive':True, 'xatol':1})
             if (res.fun == 255*3*self.w1*self.h1*self.h2*self.w2):
                 self.clear_previousPiteration()
                 continue
