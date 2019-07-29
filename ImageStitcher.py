@@ -1,6 +1,6 @@
 import cv2
 import numpy as np
-# import time 
+import time 
 from scipy.optimize import minimize
 import random
 import math
@@ -38,16 +38,16 @@ class ImageStitcher:
         return rectangle1,rectangle2
 
     def unnormalise(self, parameters):
-        a,b,c,d,thetha,t_x,t_y, a1,b1,c1,d1,thetha1,t_x1,t_y1 = parameters
-        a,a1 = a *1.1 +0.7, a1 *1.1 +0.7
-        b,b1 = b *1.1 +0.7, b1 *1.1 +0.7
-        c,c1 = c *1.1 +0.7, c1 *1.1 +0.7
-        d,d1 = d *1.1 +0.7, d1 *1.1 +0.7
+        s_x,s_y,a,b,thetha,t_x,t_y, s_x1,s_y1,a1,b1,thetha1,t_x1,t_y1 = parameters
+        s_x,s_x1 = a *1.1 +0.65, a1 *1.1 +0.65
+        s_y,s_y1 = b *1.1 +0.65, b1 *1.1 +0.65
+        a,a1 = a*0.3, a1*0.3
+        b,b1 = b*0.3 ,b1*0.3
         thetha, thetha1 = thetha*360, thetha1*360
         h,w = self.canvas.shape[:2]
-        t_x, t_x1 = t_x*w, t_x1*w
-        t_y, t_y1 = t_y*h, t_y1*h
-        return [a,b,c,d,thetha,t_x,t_y, a1,b1,c1,d1,thetha1,t_x1,t_y1]
+        t_x, t_x1 = t_x*w/2, t_x1*w/2
+        t_y, t_y1 = t_y*h/2, t_y1*h/2
+        return [s_x,s_y,a,b,thetha,t_x,t_y, s_x1,s_y1,a1,b1,thetha1,t_x1,t_y1]
 
     def calculateLoss(self,parameters):
         #sys.stdout.write("\r Parameters:{0}      ☚||||".format(parameters[:]))
@@ -57,13 +57,13 @@ class ImageStitcher:
         if (coordinates_of_intersection == -1):
             return 255*3*self.w1*self.h1*self.h2*self.w2
         difference = np.square(np.subtract(self.canvas[coordinates_of_intersection[0]],self.canvas[coordinates_of_intersection[1]]))
-        loss = np.mean(difference)
+        loss = np.mean(difference) + (parameters[2]+parameters[3]+parameters[9]+parameters[10])*10
         sys.stdout.write("\r  Loss:{0}       ☚||||".format(loss))
         return loss
 
     def drawImage(self,param,time):
         param = self.unnormalise(param)
-        a,b,c,d,thetha,t_x,t_y, a1,b1,c1,d1,thetha1,t_x1,t_y1 = param
+        s_x,s_y,a,b,thetha,t_x,t_y, s_x1,s_y1,a1,b1,thetha1,t_x1,t_y1 = param
         thetha = thetha * math.pi/180
         thetha1 = thetha1 * math.pi/180
         r_cos = math.cos(thetha)
@@ -84,15 +84,30 @@ class ImageStitcher:
         centrex1 = w/2
         centrey1 = h/2
 
-        x_off = centrex - centrex * r_cos + centrey * r_sin + t_x
-        y_off = centrey - centrex * r_sin - centrey * r_cos + t_y
+        x_rotate = centrex - centrex * r_cos + centrey * r_sin
+        y_rotate = centrey - centrex * r_sin - centrey * r_cos
 
-        x_off1 = centrex1 - centrex1 * r_cos1 + centrey1 * r_sin1 + t_x1
-        y_off1 = centrey1 - centrex1 * r_sin1 - centrey1 * r_cos1 + t_y1
+        x_rotate1 = centrex1 - centrex1 * r_cos1 + centrey1 * r_sin1
+        y_rotate1 = centrey1 - centrex1 * r_sin1 - centrey1 * r_cos1
 
-        M1 = np.float32([[a*r_cos,-b*r_sin, x_off],[c*r_sin,d*r_cos,y_off],[0,0,1]])
+        a11 = s_x*(r_cos-b*r_sin)
+        a12 = s_x*(a*r_cos-r_sin)
+        a13 = x_rotate*s_x + centrex*(1-s_x) + t_x
+        a21 = s_y*(r_sin+b*r_cos)
+        a22 = s_y*(a*r_sin+r_cos)
+        a23 = y_rotate*s_y + centrey*(1-s_y) + t_y
+
+        M1 = np.float32([[a11,a12, a13],[a21,a22,a23],[0,0,1]])
         vis1 = cv2.warpPerspective(vis1,M1,(w,h))
-        M2 = np.float32([[a1*r_cos1,-b1*r_sin1, x_off1],[c1*r_sin1,d1*r_cos1,y_off1],[0,0,1]])
+
+        a11 = s_x1*(r_cos1-b1*r_sin1)
+        a12 = s_x1*(a1*r_cos1-r_sin1)
+        a13 = x_rotate1*s_x1 + centrex1*(1-s_x1) + t_x1
+        a21 = s_y1*(r_sin1+b1*r_cos1)
+        a22 = s_y1*(a1*r_sin1+r_cos1)
+        a23 = y_rotate1*s_y1 + centrey1*(1-s_y1) + t_y1
+
+        M2 = np.float32([[a11,a12, a13],[a21,a22,a23],[0,0,1]])        
         vis2 =cv2.warpPerspective(vis2,M2,(w,h))
         vis1_without2 = cv2.subtract(vis1,vis2)
         added_image = cv2.addWeighted(vis1_without2,1,vis2,1,0)
@@ -124,31 +139,31 @@ class ImageStitcher:
         self.coor_system = CoordinateSystem((len(self.canvas[0])/2,len(self.canvas)/2))
         self.coor_system.set_canvas(self.canvas.shape[:2])
 
-    def run_nelder_mead(self,i,n):
-        x0 = []
-        for i in range(12):
-            param = random.uniform(0,3)
-            x0.append(param)
-        print("Iteration N: ",i,"/",n+1)
-        res = minimize(self.calculateLoss,x0, method = 'nelder-mead', options={'disp':True})
-        print("\n\n\n\n")
-        return [res.fun,res.x]
+    def clear_previousPiteration(self):
+        for j in range(5):
+            sys.stdout.write("\033[F")
+        for j in range(5):
+            print("                                                                                           \n")
+        for j in range(7):
+            sys.stdout.write("\033[F") 
 
     def mosaicImages(self,n):
         print("\n\n\n")
         self.set_canvas()
         h,w = self.canvas.shape[:2]
         savedParameters = [[],[]]
-        for i in range(n):
-            x0 = []
-            for j in range(14):
-                param = random.uniform(0,1)
-                x0.append(param)
+        i=0
+        while (i<n):
+            x0 = [random.uniform(0,1) for j in range(14)]
             print("Iteration N: ",i+1,"/",n)
-            res = minimize(self.calculateLoss,x0, method = 'nelder-mead', options={'disp':True})
+            res = minimize(self.calculateLoss,x0, method = 'nelder-mead', options={'disp':True, 'maxiter':100, 'adaptive':True})
+            if (res.fun == 255*3*self.w1*self.h1*self.h2*self.w2):
+                self.clear_previousPiteration()
+                continue
             savedParameters[0].append(res.fun)
             savedParameters[1].append(res.x)
             print("\n\n\n\n")
+            i+=1
         minimumErrorIndex = savedParameters[0].index(min(savedParameters[0]))
         print("\n\n\n\n\n\n")
         print(savedParameters)

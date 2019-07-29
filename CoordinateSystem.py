@@ -64,10 +64,10 @@ class CoordinateSystem:
     def get_intersection_polygon(self):
         # Start = time.time()
         p1 = self.polygon1
-        x1,y1= p1.exterior.xy
+        # x1,y1= p1.exterior.xy
         p2 = self.polygon2
-        p2 = loads(dumps(p2, rounding_precision=0))
-        x2,y2= p2.exterior.xy
+        # p2 = loads(dumps(p2, rounding_precision=0))
+        # x2,y2= p2.exterior.xy
         intersection = p1.intersection(p2)
         # end = time.time()
         # print("get intersection: ",end-Start ,"\n\n")
@@ -75,7 +75,7 @@ class CoordinateSystem:
 
     def get_coordinates_in_polygon(self, polygon):
         #Start = time.time()
-        p1 = Polygon(self.rectangle1)
+        p1 = self.polygon1
         if (polygon.area <= p1.area*0.04):
             return -1
         polygon = loads(dumps(polygon, rounding_precision=0))
@@ -114,7 +114,7 @@ class CoordinateSystem:
         return (new_format[1],new_format[0],new_format[2])
 
     def construct_transformation_matrix(self,parameters,polygon):
-        a,b,c,d,thetha_degrees,t_x,t_y = parameters
+        s_x,s_y,a,b,thetha_degrees,t_x,t_y = parameters
         thetha = thetha_degrees * math.pi/180
         r_cos = math.cos(thetha)
         r_sin = math.sin(thetha)
@@ -122,15 +122,22 @@ class CoordinateSystem:
         centrex, centrey = polygon.centroid.coords.xy
         centrex, centrey = centrex[0], centrey[0]
 
-        x_off = centrex - centrex * r_cos + centrey * r_sin + t_x
-        y_off = centrey - centrex * r_sin - centrey * r_cos + t_y
-        M = [a*r_cos, -b*r_sin, c*r_sin, d*r_cos, x_off, y_off]
+        x_rotate = centrex - centrex * r_cos + centrey * r_sin
+        y_rotate = centrey - centrex * r_sin - centrey * r_cos
+        a11 = s_x*(r_cos-b*r_sin)
+        a12 = s_x*(a*r_cos-r_sin)
+        a13 = x_rotate*s_x + centrex*(1-s_x) + t_x
+        a21 = s_y*(r_sin+b*r_cos)
+        a22 = s_y*(a*r_sin+r_cos)
+        a23 = y_rotate*s_y + centrey*(1-s_y) + t_y
+        
+        M = [a11,a12,a21,a22,a13,a23]
         return M
 
     def get_indecies_on_rotate(self, parameters):
-        a,b,c,d,thetha,t_x,t_y, a1,b1,c1,d1,thetha1,t_x1,t_y1  = parameters
-        M1 = self.construct_transformation_matrix((a,b,c,d,thetha,t_x,t_y),self.polygon1)
-        M2 = self.construct_transformation_matrix((a1,b1,c1,d1,thetha1,t_x1,t_y1),self.polygon2)
+        s_x,s_y,a,b,thetha,t_x,t_y, s_x1,s_y1,a1,b1,thetha1,t_x1,t_y1  = parameters
+        M1 = self.construct_transformation_matrix((s_x,s_y,a,b,thetha,t_x,t_y),self.polygon1)
+        M2 = self.construct_transformation_matrix((s_x1,s_y1,a1,b1,thetha1,t_x1,t_y1),self.polygon2)
         self.polygon1 = self.transform(M1,self.polygon1)
         self.polygon2 = self.transform(M2,self.polygon2)
         if (not self.satisfaction_test()):
