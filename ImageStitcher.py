@@ -39,14 +39,14 @@ class ImageStitcher:
 
     def unnormalise(self, parameters):
         s_x,s_y,a,b,thetha,t_x,t_y, s_x1,s_y1,a1,b1,thetha1,t_x1,t_y1 = parameters
-        s_x,s_x1 = a *1.1 +0.65, a1 *1.1 +0.65
-        s_y,s_y1 = b *1.1 +0.65, b1 *1.1 +0.65
-        a,a1 = a*0.3, a1*0.3
-        b,b1 = b*0.3 ,b1*0.3
-        thetha, thetha1 = thetha*360, thetha1*360
+        s_x,s_x1 = (s_x *1.1 +0.65)/0.5, (s_x1 *1.1 +0.65)/0.5
+        s_y,s_y1 = (s_y *1.1 +0.65)/0.5, (s_y1 *1.1 +0.65)/0.5
+        a,a1 = a*0.3/0.5, a1*0.3/0.5
+        b,b1 = b*0.3/0.5 ,b1*0.3/0.5
+        thetha, thetha1 = thetha*360/0.5, thetha1*360/0.5
         h,w = self.canvas.shape[:2]
-        t_x, t_x1 = t_x*w/2, t_x1*w/2
-        t_y, t_y1 = t_y*h/2, t_y1*h/2
+        t_x, t_x1 = t_x*w/2/0.5, t_x1*w/2/0.5
+        t_y, t_y1 = t_y*h/2/0.5, t_y1*h/2/0.5
         return [s_x,s_y,a,b,thetha,t_x,t_y, s_x1,s_y1,a1,b1,thetha1,t_x1,t_y1]
 
     def calculateLoss(self,parameters):
@@ -57,8 +57,10 @@ class ImageStitcher:
         if (coordinates_of_intersection == -1):
             return 255*3*self.w1*self.h1*self.h2*self.w2
         difference = np.square(np.subtract(self.canvas[coordinates_of_intersection[0]],self.canvas[coordinates_of_intersection[1]]))
-        loss = np.mean(difference) + (parameters[2]+parameters[3]+parameters[9]+parameters[10])*10
-        sys.stdout.write("\r  Loss:{0}       ☚||||".format(loss))
+        loss = np.mean(difference)
+        # sys.stdout.write("\r  Loss:{0}       ☚||||".format(loss))
+        print(loss)
+            # + (parameters[2]+parameters[3]+parameters[9]+parameters[10])*10
         return loss
 
     def drawImage(self,param,time):
@@ -116,20 +118,6 @@ class ImageStitcher:
         cv2.imshow('image',added_image)
         cv2.waitKey(time)
 
-    def rotateImage(self,angleInDegrees):
-        thetha = angleInDegrees * math.pi/180
-        a = math.cos(thetha)
-        b = math.sin(thetha)
-        canvas = np.zeros((self.h1*2+self.img2_canvas_size,self.w1*2+self.img2_canvas_size,3), dtype=np.uint8)
-        canvas[self.h1+int((self.img2_canvas_size-self.h2)/2):self.h2+self.h1+int((self.img2_canvas_size-self.h2)/2), 
-        self.w1+int((self.img2_canvas_size-self.w2)/2):self.w1+self.w2+int((self.img2_canvas_size-self.w2)/2),
-        :3] = self.img2
-        h, w = canvas.shape[:2]
-        M = np.float32([[a,b,(1-a)*w/2-b*h/2],[-b,a,b*w/2+(1-a)*h/2],[0,0,1]])
-        canvas = cv2.warpPerspective(canvas,M,(w,h))
-        # canvas[:self.h1,:self.w1,:3] = self.img1
-        return canvas
-
     def set_canvas(self):
         self.canvas = np.zeros((self.h1*2+self.img2_canvas_size,self.w1*2+self.img2_canvas_size,3), dtype=np.uint8)
         self.canvas[self.h1+int((self.img2_canvas_size-self.h2)/2):self.h2+self.h1+int((self.img2_canvas_size-self.h2)/2), 
@@ -154,16 +142,20 @@ class ImageStitcher:
         savedParameters = [[],[]]
         i=0
         while (i<n):
-            x0 = [random.uniform(0,1) for j in range(14)]
+            x0 = [random.uniform(0,0.5) for j in range(14)]
             print("Iteration N: ",i+1,"/",n)
-            res = minimize(self.calculateLoss,x0, method = 'nelder-mead', options={'disp':True, 'adaptive':True, 'xatol':1})
+            start = time.time()
+            res = minimize(self.calculateLoss,x0, method = 'nelder-mead', options={'disp':True, 'adaptive':True})
+            # res = minimize(self.calculateLoss,x0, method = 'COBYLA', options={'disp':True})
             if (res.fun == 255*3*self.w1*self.h1*self.h2*self.w2):
-                self.clear_previousPiteration()
+                # self.clear_previousPiteration()
                 continue
             savedParameters[0].append(res.fun)
             savedParameters[1].append(res.x)
-            print("\n\n\n\n")
             i+=1
+            end = time.time()
+            print("Time taken: ",end-start)
+            print("\n\n\n\n")
         minimumErrorIndex = savedParameters[0].index(min(savedParameters[0]))
         print("\n\n\n\n\n\n")
         print(savedParameters)

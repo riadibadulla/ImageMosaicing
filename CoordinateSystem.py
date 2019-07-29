@@ -79,7 +79,7 @@ class CoordinateSystem:
         if (polygon.area <= p1.area*0.04):
             return -1
         polygon = loads(dumps(polygon, rounding_precision=0))
-        rectangle = list(polygon.exterior.coords)
+        rectangle = polygon.exterior.coords
         bounds = self.canvas.bounds
         height = int(bounds[3]) - int(bounds[1])
         width = int(bounds[2]) - int(bounds[0])
@@ -92,10 +92,10 @@ class CoordinateSystem:
         mask = grid.reshape(width,height)
         coords = np.nonzero(mask)
         coords = np.array(coords)
-        coordsInTupples = list(tuple(map(tuple, coords.transpose())))
+        # coordsInTupples = list(tuple(map(tuple, coords.transpose())))
         #end = time.time()
         #print("geting the coornates: ",end-Start,"\n\n" )
-        return LineString(coordsInTupples)
+        return LineString(coords.T)
 
     def get_numpy_coords(self, shape):
         coordintes = np.array(shape.xy)
