@@ -9,7 +9,7 @@ class main:
 
     def mosaic2Images(img1,img2,iterations):
         START_TIME = time.time()
-        mosaic = ImageStitcher(img1.copy(),img2.copy(),False)
+        mosaic = ImageStitcher(img1.copy(),img2.copy(),True)
         mosaic.mosaicImages(iterations)
         END_TIME = time.time()
         print("Time taken: ", format(END_TIME - START_TIME), " seconds")

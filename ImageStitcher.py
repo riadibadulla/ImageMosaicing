@@ -2,6 +2,7 @@ import cv2
 import numpy as np
 import time 
 from scipy.optimize import minimize
+from scipy.optimize import brute
 import random
 import math
 from CoordinateSystem import CoordinateSystem
@@ -17,6 +18,7 @@ class ImageStitcher:
     canvas = None
     coor_system = None
     best_parameters = []
+    max_possible_error = 0
 
     def __init__(self, img1, img2, resize):
         self.img1 = img1
@@ -27,6 +29,7 @@ class ImageStitcher:
         self.h1, self.w1 = self.img1.shape[:2]
         self.h2, self.w2 = self.img2.shape[:2]
         self.img2_canvas_size = int(math.sqrt(math.pow(self.h2,2)+math.pow(self.w2,2)))
+        self.max_possible_error = 255*3*self.w1*self.h1*self.h2*self.w2*100
         print("H1: ",self.h1,"  W1: ",self.w1,"\nH2: ",self.h2,"  W2: ",self.w2)
         
     def getCornersOfImages(self):
@@ -55,11 +58,11 @@ class ImageStitcher:
         self.coor_system.set_rectangles(self.getCornersOfImages())
         coordinates_of_intersection = self.coor_system.get_indecies_on_rotate(parameters)
         if (coordinates_of_intersection == -1):
-            return 255*3*self.w1*self.h1*self.h2*self.w2
+            return self.max_possible_error
         difference = np.square(np.subtract(self.canvas[coordinates_of_intersection[0]],self.canvas[coordinates_of_intersection[1]]))
         loss = np.mean(difference)
-        # sys.stdout.write("\r  Loss:{0}       ☚||||".format(loss))
-        print(loss)
+        sys.stdout.write("\r  Loss:{0}       ☚||||".format(loss))
+        # print(loss)
             # + (parameters[2]+parameters[3]+parameters[9]+parameters[10])*10
         return loss
 
@@ -141,17 +144,21 @@ class ImageStitcher:
         h,w = self.canvas.shape[:2]
         savedParameters = [[],[]]
         i=0
+        # ranges = tuple([slice(0,1,0.5) for i in range(14)]) # for brute
         while (i<n):
             x0 = [random.uniform(0,0.5) for j in range(14)]
             print("Iteration N: ",i+1,"/",n)
             start = time.time()
-            res = minimize(self.calculateLoss,x0, method = 'nelder-mead', options={'disp':True, 'adaptive':True})
+            res = minimize(self.calculateLoss,x0, method = 'nelder-mead', options={'disp':True, 'adaptive':True, 'fatol':10})
             # res = minimize(self.calculateLoss,x0, method = 'COBYLA', options={'disp':True})
-            if (res.fun == 255*3*self.w1*self.h1*self.h2*self.w2):
-                # self.clear_previousPiteration()
+            # res = brute(self.calculateLoss, ranges,Ns = 3,disp=True,workers=4)
+            if (res.fun == self.max_possible_error):
+                self.clear_previousPiteration()
                 continue
             savedParameters[0].append(res.fun)
             savedParameters[1].append(res.x)
+            # savedParameters[0].append(res.fval)
+            # savedParameters[1].append(res.x0)
             i+=1
             end = time.time()
             print("Time taken: ",end-start)

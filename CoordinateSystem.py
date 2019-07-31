@@ -74,7 +74,7 @@ class CoordinateSystem:
         return intersection
 
     def get_coordinates_in_polygon(self, polygon):
-        #Start = time.time()
+        # Start = time.time()
         p1 = self.polygon1
         if (polygon.area <= p1.area*0.04):
             return -1
@@ -93,8 +93,8 @@ class CoordinateSystem:
         coords = np.nonzero(mask)
         coords = np.array(coords)
         # coordsInTupples = list(tuple(map(tuple, coords.transpose())))
-        #end = time.time()
-        #print("geting the coornates: ",end-Start,"\n\n" )
+        # end = time.time()
+        # print("geting the coornates: ",end-Start,"\n\n" )
         return LineString(coords.T)
 
     def get_numpy_coords(self, shape):
@@ -102,18 +102,20 @@ class CoordinateSystem:
         return coordintes
 
     def make_image_format_indexing(self,coordintes):
+        #0.034s
         # Start = time.time()
         new_format = np.repeat(coordintes,3,1)
         new_format = np.append(new_format,np.array([np.tile(np.array([0,1,2]),int(len(coordintes[0])))]),axis=0)
+        new_format = np.around(new_format).astype(int)
         # end = time.time()
         # print("Numpy coornates: ",end-Start,"\n\n")
-        new_format = np.around(new_format).astype(int)
         return new_format
     
     def makeImageCoordinateFormat(self,new_format):
         return (new_format[1],new_format[0],new_format[2])
 
     def construct_transformation_matrix(self,parameters,polygon):
+        # st = time.time()
         s_x,s_y,a,b,thetha_degrees,t_x,t_y = parameters
         thetha = thetha_degrees * math.pi/180
         r_cos = math.cos(thetha)
@@ -132,9 +134,12 @@ class CoordinateSystem:
         a23 = y_rotate*s_y + centrey*(1-s_y) + t_y
         
         M = [a11,a12,a21,a22,a13,a23]
+        # en= time.time()
+        # print("time ",en-st)
         return M
 
     def get_indecies_on_rotate(self, parameters):
+        # start = time.time()
         s_x,s_y,a,b,thetha,t_x,t_y, s_x1,s_y1,a1,b1,thetha1,t_x1,t_y1  = parameters
         M1 = self.construct_transformation_matrix((s_x,s_y,a,b,thetha,t_x,t_y),self.polygon1)
         M2 = self.construct_transformation_matrix((s_x1,s_y1,a1,b1,thetha1,t_x1,t_y1),self.polygon2)
@@ -170,4 +175,6 @@ class CoordinateSystem:
         # plt.legend(['Image1','Image2','Transformed image2','Transformed image1', 'Intersection','Intersection coordinates inverted back'], loc='best')
         # plt.title("Obtaining the coordinates")
         # plt.savefig("polygon.png", dpi=700)
+        # end = time.time()
+        # print("time: ",start-end)
         return (coordinates_in_polygon1, coordinates_in_polygon2)
