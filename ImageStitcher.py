@@ -17,6 +17,7 @@ class ImageStitcher:
     h1,h2,w1,w2 = 0,0,0,0
     canvas = None
     coor_system = None
+    best_loss = None
     best_parameters = []
     max_possible_error = 0
 
@@ -42,8 +43,8 @@ class ImageStitcher:
 
     def unnormalise(self, parameters):
         s_x,s_y,a,b,thetha,t_x,t_y, s_x1,s_y1,a1,b1,thetha1,t_x1,t_y1 = parameters
-        s_x,s_x1 = (s_x *1.1 +0.65)/0.5, (s_x1 *1.1 +0.65)/0.5
-        s_y,s_y1 = (s_y *1.1 +0.65)/0.5, (s_y1 *1.1 +0.65)/0.5
+        s_x,s_x1 = (s_x+0.75)/0.5, (s_x+0.75)/0.5
+        s_y,s_y1 = s_y/0.5, s_y1/0.5
         a,a1 = a*0.3/0.5, a1*0.3/0.5
         b,b1 = b*0.3/0.5 ,b1*0.3/0.5
         thetha, thetha1 = thetha*360/0.5, thetha1*360/0.5
@@ -142,7 +143,7 @@ class ImageStitcher:
         print("\n\n\n")
         self.set_canvas()
         h,w = self.canvas.shape[:2]
-        savedParameters = [[],[]]
+        # savedParameters = [[],[]]
         i=0
         # ranges = tuple([slice(0,1,0.5) for i in range(14)]) # for brute
         while (i<n):
@@ -155,22 +156,19 @@ class ImageStitcher:
             if (res.fun == self.max_possible_error):
                 self.clear_previousPiteration()
                 continue
-            savedParameters[0].append(res.fun)
-            savedParameters[1].append(res.x)
-            # savedParameters[0].append(res.fval)
-            # savedParameters[1].append(res.x0)
+            if (self.best_loss == None):
+                self.best_loss = res.fun
+                self.best_parameters = res.x
+            if (self.best_loss>res.fun):
+                self.best_loss = res.fun
+                self.best_parameters = res.x
             i+=1
             end = time.time()
             print("Time taken: ",end-start)
             print("\n\n\n\n")
-        minimumErrorIndex = savedParameters[0].index(min(savedParameters[0]))
         print("\n\n\n\n\n\n")
-        print(savedParameters)
-        print("\n\n\n\n\n\n")
-        print("Error Index: ",minimumErrorIndex)
-        print("Minimum Loss: ",savedParameters[0][minimumErrorIndex])
-        print("Parameters ",savedParameters[1][minimumErrorIndex])
-        self.best_parameters = savedParameters[1][minimumErrorIndex]
+        print("Minimum Loss: ",self.best_loss)
+        print("Parameters ",self.best_parameters)
     
     def test_one_iter(self, x0):
         print("\n\n\n")
