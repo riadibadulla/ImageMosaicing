@@ -132,13 +132,36 @@ class ImageStitcher:
         self.coor_system = CoordinateSystem((len(self.canvas[0])/2,len(self.canvas)/2))
         self.coor_system.set_canvas(self.canvas.shape[:2])
 
-    def clear_previousPiteration(self):
+    def clear_previous_iteration(self):
         for j in range(5):
             sys.stdout.write("\033[F")
         for j in range(5):
             print("                                                                                           ")
         for j in range(5):
             sys.stdout.write("\033[F") 
+    
+    def optimese_translations(self, t_x, t_y, t_x1,t_y1):
+        parameters = self.best_parameters
+        parameters[5], parameters[6] = t_x, t_y
+        parameters[12], parameters[13] = t_x1, t_y1
+        calculateLoss(parameters)
+    
+    def optimese_rotation(self, thetha, thetha1):
+        parameters = self.best_parameters
+        parameters[4], parameters[11] = thetha, thetha1
+        calculateLoss(parameters)
+        
+    def optimese_scale(self, s_x, s_y, s_x1, s_y1):
+        parameters = self.best_parameters
+        parameters[0], parameters[1] = s_x, s_y
+        parameters[7], parameters[8] = s_x1, s_y1
+        calculateLoss(parameters)
+    
+    def optimese_shear(self, a, b, a1, b1):
+        parameters = self.best_parameters
+        parameters[2], parameters[3] = a, b
+        parameters[9], parameters[10] = a1, b1
+        calculateLoss(parameters)
 
     def mosaicImages(self,n):
         print("\n\n\n")
@@ -151,7 +174,7 @@ class ImageStitcher:
             start = time.time()
             res = minimize(self.calculateLoss,x0, method = 'nelder-mead', options={'disp':True, 'adaptive':True, 'fatol':10})
             if (res.fun == self.max_possible_error):
-                self.clear_previousPiteration()
+                self.clear_previous_iteration()
                 continue
             if (self.best_loss == None):
                 self.best_loss = res.fun
