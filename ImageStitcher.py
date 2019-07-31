@@ -18,7 +18,8 @@ class ImageStitcher:
     canvas = None
     coor_system = None
     best_loss = None
-    best_parameters = []
+    best_parameters = [-0.25,-0.25,0,0,0,0,0,-0.25,-0.25,0,0,0,0,0]
+
     max_possible_error = 0
 
     def __init__(self, img1, img2, resize):
@@ -43,8 +44,8 @@ class ImageStitcher:
 
     def unnormalise(self, parameters):
         s_x,s_y,a,b,thetha,t_x,t_y, s_x1,s_y1,a1,b1,thetha1,t_x1,t_y1 = parameters
-        s_x,s_x1 = (s_x+0.75)/0.5, (s_x+0.75)/0.5
-        s_y,s_y1 = s_y/0.5, s_y1/0.5
+        s_x,s_x1 = (s_x+0.75)/0.5, (s_x1+0.75)/0.5
+        s_y,s_y1 = (s_y+0.75)/0.5, (s_y1+0.75)/0.5
         a,a1 = a*0.3/0.5, a1*0.3/0.5
         b,b1 = b*0.3/0.5 ,b1*0.3/0.5
         thetha, thetha1 = thetha*360/0.5, thetha1*360/0.5
@@ -143,16 +144,12 @@ class ImageStitcher:
         print("\n\n\n")
         self.set_canvas()
         h,w = self.canvas.shape[:2]
-        # savedParameters = [[],[]]
         i=0
-        # ranges = tuple([slice(0,1,0.5) for i in range(14)]) # for brute
         while (i<n):
             x0 = [random.uniform(0,0.5) for j in range(14)]
             print("Iteration N: ",i+1,"/",n)
             start = time.time()
             res = minimize(self.calculateLoss,x0, method = 'nelder-mead', options={'disp':True, 'adaptive':True, 'fatol':10})
-            # res = minimize(self.calculateLoss,x0, method = 'COBYLA', options={'disp':True})
-            # res = brute(self.calculateLoss, ranges,Ns = 3,disp=True,workers=4)
             if (res.fun == self.max_possible_error):
                 self.clear_previousPiteration()
                 continue
