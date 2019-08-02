@@ -1,12 +1,11 @@
 from ImageStitcher import ImageStitcher
 import cv2
 
-img1 = cv2.imread('images/Map1-rotate.png')
-img2 = cv2.imread('images/Map2.png')  
+img1 = cv2.imread('images/AndrewsMap1.png')
+img2 = cv2.imread('images/AndrewsMap2.png')  
 
 # x0 = [0.5,0.5,0.2,0.2,-0.08,0.25,0.47,0.5,0.5,0,0,0,0,0]
-x0 = [-0.25,-0.25,0,0,0,0,0,-0.25,-0.25,0,0,0,0,0]
-
+x0= [0.3638482486095052, 0.32639801929129725, 0.3828875312696233, 0.044589176398616204, 0.34655670645618375, 0.24149286730417746, 0.23005783046177014, 0.29420994688155916, 0.38862860100803776, 0.4059146206021867, 0.38929349323612994, 0.01411505671288083, 0.4630171892245237, 0.47112658354032355]
 stitcher =ImageStitcher(img1,img2,False)
 stitcher.set_canvas()
 stitcher.test_one_iter(x0)
