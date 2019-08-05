@@ -1,0 +1,16 @@
+actual
+Iteration N:  1 / 1
+  Loss:122.18132058012776 , Regularisation:21.589291534030487 ☚||||122.18132058012776
+
+
+resized:
+50iter
+Minimum Loss:  99.73508583341352
+Parameters  [-0.25, -0.25, 0, 0, 0.3790230571621078, 0.4962522510691917, 0.574624331073313, -0.25, -0.25, 0, 0, 0.4456341649646865, 0.12303123684125844, 0.1426296043643207]
+Time taken:  3404.7995409965515  seconds
+
+regularisation = (math.pow(parameters[2],2)+
+        math.pow(parameters[3],2)+math.pow(parameters[9],2)+math.pow(parameters[10],2))*0.01+coordinates_of_intersection[2]*0.0005
+        loss = loss + regularisation
+
+0.25x0.25

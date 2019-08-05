@@ -1,0 +1,33 @@
+math.pow(parameters[3],2)+math.pow(parameters[9],2)+math.pow(parameters[10],2))*1+coordinates_of_intersection[2]*0.0005
+        loss = loss + regularisation
+
+teration N:  20 / 20
+  Loss:85.1345983414209 , Regularisation:6.373402995863767 ☚||||Optimization terminated successfully.
+         Current function value: 84.941388                                                 
+         Iterations: 73                                                                    
+         Function evaluations: 172                                                         
+  Loss:88.2891339758755 , Regularisation:3.048739123308714 ☚||||Optimization terminated successfully.
+         Current function value: 88.260999
+         Iterations: 33
+         Function evaluations: 73
+  Loss:86.78111578970703 , Regularisation:5.23515711146488 ☚||||Optimization terminated successfully.
+         Current function value: 86.723589                                                 
+         Iterations: 69                                                                    
+         Function evaluations: 156                                                         
+Time taken:  67.87455892562866
+
+
+
+
+
+
+
+
+
+
+
+
+Minimum Loss:  84.31734194076569
+Parameters  [-0.25, -0.25, 0.17014250497314776, 0.4378971774634577, 0, 0.3631554746160932, 0.42378292326820755, -0.25, -0.25, 0.3658500688844794, 0.3506367422975808, 0, 0.06394339183165745, 0.064925597015935]
+Time taken:  1588.946349620819  seconds
+

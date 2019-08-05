@@ -1,0 +1,5 @@
+regularisation = (math.pow(parameters[2],2)+
+        math.pow(parameters[3],2)+math.pow(parameters[9],2)+math.pow(parameters[10],2))*0.01+coordinates_of_intersection[2]*0.0005
+        loss = loss + regularisation
+
+778

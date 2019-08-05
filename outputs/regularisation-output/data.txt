@@ -1,0 +1,35 @@
+Iteration N:  10 / 10
+  Loss:100.2745773557181 , Regularisation:1.3067655952344879 ☚||||Optimization terminated successfully.
+         Current function value: 100.274577                                                
+         Iterations: 65                                                                    
+         Function evaluations: 149                                                         
+  Loss:104.55648310257911 , Regularisation:1.3499372999105157 ☚||||Optimization terminated successfully.
+         Current function value: 104.321959
+         Iterations: 18
+         Function evaluations: 44
+  Loss:102.58717728560791 , Regularisation:1.3499372999105332 ☚||||Optimization terminated successfully.
+         Current function value: 102.587177                                                
+         Iterations: 44                                                                    
+         Function evaluations: 105                                                         
+  Loss:101.93939908714842 , Regularisation:0.6141113292338646 ☚||||Optimization terminated successfully.
+         Current function value: 101.907127
+         Iterations: 39
+         Function evaluations: 104
+Time taken:  109.14213609695435
+
+
+
+
+Minimum Loss:  99.85890940835601
+Parameters  [-0.25, -0.25, 0, 0, 0.3790230571621078, 0.4406403904197238, 0.5733231075997555, -0.25, -0.25, 0, 0, 0.4456341649646865, 0.06772009234315944, 0.1413981934563503]
+Time taken:  992.3172383308411  seconds
+
+
+0.25x0.25
+regularisation = (math.pow(parameters[2],2)+
+        math.pow(parameters[3],2)+math.pow(parameters[9],2)+math.pow(parameters[10],2))*0.2+coordinates_of_intersection[2]*0.0005
+        loss = loss + regularisation
+
+actual:
+Iteration N:  1 / 1
+  Loss:122.19870332360054 , Regularisation:21.550152702399355 ☚||||122.19870332360054

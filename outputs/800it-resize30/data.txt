@@ -1,0 +1,43 @@
+Iteration N:  799 / 800
+  Loss:79.9579857893111       ☚||||Optimization terminated successfully.                   
+         Current function value: 79.442539                                                 
+         Iterations: 57                                                                    
+         Function evaluations: 133                                                         
+  Loss:99.40260147312334       ☚||||Optimization terminated successfully.                  
+         Current function value: 99.309669                                                 
+         Iterations: 15                                                                    
+         Function evaluations: 38                                                          
+Time taken:  12.41079592704773                                                             
+                                                                                           
+                                                                                           
+                                                                                           
+
+
+Iteration N:  800 / 800
+  Loss:100.47519223727572       ☚||||Optimization terminated successfully.                 
+         Current function value: 100.475192                                                
+         Iterations: 43                                                                    
+         Function evaluations: 125                                                         
+  Loss:96.41602602010644       ☚||||Optimization terminated successfully.
+         Current function value: 96.120522
+         Iterations: 20
+         Function evaluations: 49
+Time taken:  19.290837287902832                                                            
+                                                                                           
+                                                                                           
+                                                                                           
+
+
+
+
+
+
+
+
+
+Minimum Loss:  76.91549295774648
+Parameters  [-0.25, -0.25, 0.3009067185650742, 0.1167995771209133, 0.07362034008140443, 0.30271378993819587, 0.43657337845385924, -0.25, -0.25, 0.023758766707221643, 0.013028265778221955, 0.025292015585103342, 0.22108957724636424, 0.22916773700949294]
+Time taken:  22710.413083791733  seconds
+
+actual:
+Loss:80.90915160687261       ☚||||80.90915160687261

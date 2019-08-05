@@ -26,8 +26,8 @@ class ImageStitcher:
         self.img1 = img1
         self.img2 = img2
         if (resize):
-            self.img1 = cv2.resize(self.img1,None,fx=0.1,fy=0.1)
-            self.img2 = cv2.resize(self.img2,None,fx=0.1,fy=0.1)
+            self.img1 = cv2.resize(self.img1,None,fx=0.4,fy=0.4)
+            self.img2 = cv2.resize(self.img2,None,fx=0.4,fy=0.4)
         self.h1, self.w1 = self.img1.shape[:2]
         self.h2, self.w2 = self.img2.shape[:2]
         self.img2_canvas_size = int(math.sqrt(math.pow(self.h2,2)+math.pow(self.w2,2)))
@@ -55,6 +55,16 @@ class ImageStitcher:
         t_y, t_y1 = t_y*h/2/0.5, t_y1*h/2/0.5
         return [s_x,s_y,a,b,thetha,t_x,t_y, s_x1,s_y1,a1,b1,thetha1,t_x1,t_y1]
 
+    def regularise(self,parameters, distance):
+        scale_alpha = 0.001
+        shear_aplha = 0.001
+        distance_alpha = 0.005
+        regularisation = (math.pow(parameters[2],2)+math.pow(parameters[3],2)+math.pow(parameters[9],2)+math.pow(parameters[10],2))*shear_aplha
+        + distance*distance_alpha
+        + (math.pow(parameters[0],2)+math.pow(parameters[1],2)+math.pow(parameters[7],2)+math.pow(parameters[8],2))*scale_alpha
+        return regularisation
+
+
     def calculateLoss(self,parameters):
         #sys.stdout.write("\r Parameters:{0}      ☚||||".format(parameters[:]))
         parameters = self.unnormalise(parameters)
@@ -64,9 +74,11 @@ class ImageStitcher:
             return self.max_possible_error
         difference = np.square(np.subtract(self.canvas[coordinates_of_intersection[0]],self.canvas[coordinates_of_intersection[1]]))
         loss = np.mean(difference)
-        sys.stdout.write("\r  Loss:{0}       ☚||||".format(loss))
+        regularisation = self.regularise(coordinates_of_intersection[2])
+        loss = loss + regularisation
+        sys.stdout.write("\r  Loss:{0} , Regularisation:{1} ☚||||".format(loss,parameters, regularisation))
         # print(loss)
-            # + (parameters[2]+parameters[3]+parameters[9]+parameters[10])*10
+            # + *10
         return loss
 
     def drawImage(self,param,time):
@@ -117,8 +129,8 @@ class ImageStitcher:
 
         M2 = np.float32([[a11,a12, a13],[a21,a22,a23],[0,0,1]])        
         vis2 =cv2.warpPerspective(vis2,M2,(w,h))
-        vis1_without2 = cv2.subtract(vis1,vis2)
-        added_image = cv2.addWeighted(vis1_without2,1,vis2,1,0)
+        # vis1_without2 = cv2.subtract(vis1,vis2)
+        added_image = cv2.addWeighted(vis1,1,vis2,1,0)
 
         cv2.imwrite("output.jpg",added_image)
         cv2.imshow('image',added_image)

@@ -76,7 +76,7 @@ class CoordinateSystem:
     def get_coordinates_in_polygon(self, polygon):
         # Start = time.time()
         p1 = self.polygon1
-        if (polygon.area <= p1.area*0.04):
+        if (polygon.area <= p1.area*0.02):
             return -1
         polygon = loads(dumps(polygon, rounding_precision=0))
         rectangle = polygon.exterior.coords
@@ -138,6 +138,13 @@ class CoordinateSystem:
         # print("time ",en-st)
         return M
 
+    def squared_distance_between_centres(self):
+        centrex1, centrey1 = self.polygon1.centroid.coords.xy
+        centrex2, centrey2 = self.polygon2.centroid.coords.xy
+        centrex1, centrey1 = centrex1[0], centrey1[0]
+        centrex2, centrey2 = centrex2[0], centrey2[0]
+        return (centrex1-centrex2)**2+(centrey2-centrey1)**2
+
     def get_indecies_on_rotate(self, parameters):
         # start = time.time()
         s_x,s_y,a,b,thetha,t_x,t_y, s_x1,s_y1,a1,b1,thetha1,t_x1,t_y1  = parameters
@@ -145,6 +152,7 @@ class CoordinateSystem:
         M2 = self.construct_transformation_matrix((s_x1,s_y1,a1,b1,thetha1,t_x1,t_y1),self.polygon2)
         self.polygon1 = self.transform(M1,self.polygon1)
         self.polygon2 = self.transform(M2,self.polygon2)
+        sqaured_distance = self.squared_distance_between_centres()
         if (not self.satisfaction_test()):
             return -1
         # x2, y2 =self.polygon2.exterior.xy	
@@ -177,4 +185,4 @@ class CoordinateSystem:
         # plt.savefig("polygon.png", dpi=700)
         # end = time.time()
         # print("time: ",start-end)
-        return (coordinates_in_polygon1, coordinates_in_polygon2)
+        return (coordinates_in_polygon1, coordinates_in_polygon2,sqaured_distance)
