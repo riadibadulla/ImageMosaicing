@@ -74,9 +74,9 @@ class ImageStitcher:
             return self.max_possible_error
         difference = np.square(np.subtract(self.canvas[coordinates_of_intersection[0]],self.canvas[coordinates_of_intersection[1]]))
         loss = np.mean(difference)
-        regularisation = self.regularise(coordinates_of_intersection[2])
+        regularisation = self.regularise(parameters, coordinates_of_intersection[2])
         loss = loss + regularisation
-        sys.stdout.write("\r  Loss:{0} , Regularisation:{1} ☚||||".format(loss,parameters, regularisation))
+        sys.stdout.write("\r  Loss:{0} , Regularisation:{1} ☚||||".format(loss, regularisation))
         # print(loss)
             # + *10
         return loss
@@ -129,8 +129,8 @@ class ImageStitcher:
 
         M2 = np.float32([[a11,a12, a13],[a21,a22,a23],[0,0,1]])        
         vis2 =cv2.warpPerspective(vis2,M2,(w,h))
-        # vis1_without2 = cv2.subtract(vis1,vis2)
-        added_image = cv2.addWeighted(vis1,1,vis2,1,0)
+        vis1_without2 = cv2.subtract(vis1,vis2)
+        added_image = cv2.addWeighted(vis1_without2,1,vis2,1,0)
 
         cv2.imwrite("output.jpg",added_image)
         cv2.imshow('image',added_image)

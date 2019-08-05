@@ -1,0 +1,260 @@
+Starting the algorithm
+
+
+H1:  140   W1:  161 
+H2:  140   W2:  176
+
+
+
+
+Iteration N:  1 / 10
+  Loss:35.62635854341737 , Regularisation:0.0 ☚||||Optimization terminated successfully.   
+         Current function value: 35.626359                                                 
+         Iterations: 96                                                                    
+         Function evaluations: 214                                                         
+  Loss:79.69304824806896 , Regularisation:0.0 ☚||||Optimization terminated successfully.
+         Current function value: 79.625994
+         Iterations: 31
+         Function evaluations: 59
+  Loss:79.79905696807106 , Regularisation:0.0 ☚||||Optimization terminated successfully.
+         Current function value: 79.763815
+         Iterations: 62
+         Function evaluations: 153
+  Loss:81.3406458909921 , Regularisation:0.0001753829798266816 ☚||||Optimization terminated successfully.
+         Current function value: 81.286072
+         Iterations: 49
+         Function evaluations: 130
+Time taken:  70.77551126480103
+
+
+
+
+
+Iteration N:  2 / 10
+  Loss:94.37031408308005 , Regularisation:0.0 ☚||||Optimization terminated successfully.
+         Current function value: 94.370314
+         Iterations: 47
+         Function evaluations: 154
+  Loss:98.02613578356305 , Regularisation:0.0 ☚||||Optimization terminated successfully.
+         Current function value: 98.026136
+         Iterations: 11
+         Function evaluations: 25
+  Loss:77.02023995184547 , Regularisation:0.0 ☚||||Optimization terminated successfully.
+         Current function value: 77.018414
+         Iterations: 74
+         Function evaluations: 154
+  Loss:62.738289079322044 , Regularisation:9.469640364601832e-05 ☚||||Optimization terminated successfully.
+         Current function value: 62.693547
+         Iterations: 69
+         Function evaluations: 170
+Time taken:  62.94987487792969
+
+
+
+
+
+Iteration N:  3 / 10
+  Loss:35.62635854341737 , Regularisation:0.0 ☚||||Optimization terminated successfully.   
+         Current function value: 35.626359                                                 
+         Iterations: 58                                                                    
+         Function evaluations: 153                                                         
+  Loss:97.14951532360716 , Regularisation:0.0 ☚||||Optimization terminated successfully.
+         Current function value: 96.992363
+         Iterations: 16
+         Function evaluations: 40
+  Loss:78.65961090409307 , Regularisation:0.0 ☚||||Optimization terminated successfully.   
+         Current function value: 78.621841                                                 
+         Iterations: 56                                                                    
+         Function evaluations: 148                                                         
+  Loss:99.55832223002906 , Regularisation:0.0001510734046158249 ☚||||Optimization terminated successfully.
+         Current function value: 99.520845
+         Iterations: 47
+         Function evaluations: 134
+Time taken:  58.682783365249634
+
+
+
+
+
+Iteration N:  4 / 10
+  Loss:80.24350282485875 , Regularisation:0.0 ☚||||Optimization terminated successfully.   
+         Current function value: 80.243503                                                 
+         Iterations: 34                                                                    
+         Function evaluations: 125                                                         
+  Loss:100.24362045620248 , Regularisation:0.0 ☚||||Optimization terminated successfully.
+         Current function value: 100.147207
+         Iterations: 20
+         Function evaluations: 44
+  Loss:78.22468460539 , Regularisation:0.0 ☚||||Optimization terminated successfully.      
+         Current function value: 78.224685                                                 
+         Iterations: 48                                                                    
+         Function evaluations: 131                                                         
+  Loss:62.322827178253895 , Regularisation:9.39325245889978e-05 ☚||||Optimization terminated successfully.
+         Current function value: 62.263023
+         Iterations: 71
+         Function evaluations: 167
+Time taken:  58.96242332458496
+
+
+
+
+
+Iteration N:  5 / 10
+  Loss:80.03373015873017 , Regularisation:0.0 ☚||||Optimization terminated successfully.   
+         Current function value: 80.033730                                                 
+         Iterations: 41                                                                    
+         Function evaluations: 145                                                         
+  Loss:101.61987198620369 , Regularisation:0.0 ☚||||Optimization terminated successfully.
+         Current function value: 101.401453
+         Iterations: 23
+         Function evaluations: 48
+  Loss:79.18239236040283 , Regularisation:0.0 ☚||||Optimization terminated successfully.   
+         Current function value: 79.182392                                                 
+         Iterations: 46                                                                    
+         Function evaluations: 128                                                         
+  Loss:99.04657996226352 , Regularisation:7.964236589275009e-05 ☚||||Optimization terminated successfully.
+         Current function value: 98.955012
+         Iterations: 51
+         Function evaluations: 135
+Time taken:  45.25136137008667
+
+
+
+
+
+Iteration N:  6 / 10
+  Loss:85.869918699187 , Regularisation:0.0 ☚||||Optimization terminated successfully.     
+         Current function value: 81.458898                                                 
+         Iterations: 38                                                                    
+         Function evaluations: 130                                                         
+  Loss:93.7387702136155 , Regularisation:0.0 ☚||||Optimization terminated successfully.
+         Current function value: 93.697079
+         Iterations: 21
+         Function evaluations: 46
+  Loss:79.61854400061597 , Regularisation:0.0 ☚||||Optimization terminated successfully.   
+         Current function value: 79.603799                                                 
+         Iterations: 54                                                                    
+         Function evaluations: 127                                                         
+  Loss:63.15991117711123 , Regularisation:0.00027157176876436653 ☚||||Optimization terminated successfully.
+         Current function value: 63.123554
+         Iterations: 84
+         Function evaluations: 199
+Time taken:  58.38495206832886
+
+
+
+
+
+Iteration N:  7 / 10
+  Loss:99.94232804232804 , Regularisation:0.0 ☚||||Optimization terminated successfully.   
+         Current function value: 99.942328                                                 
+         Iterations: 45                                                                    
+         Function evaluations: 145                                                         
+  Loss:102.49014530283412 , Regularisation:0.0 ☚||||Optimization terminated successfully.
+         Current function value: 102.428967
+         Iterations: 13
+         Function evaluations: 35
+  Loss:78.55632817962862 , Regularisation:0.0 ☚||||Optimization terminated successfully.
+         Current function value: 78.553246
+         Iterations: 86
+         Function evaluations: 174
+  Loss:98.85698527243291 , Regularisation:0.0001756039050872288 ☚||||Optimization terminated successfully.
+         Current function value: 98.750476
+         Iterations: 66
+         Function evaluations: 160
+Time taken:  63.51539349555969
+
+
+
+
+
+Iteration N:  8 / 10
+  Loss:93.51241666666667 , Regularisation:0.0 ☚||||Optimization terminated successfully.   
+         Current function value: 93.512417                                                 
+         Iterations: 38                                                                    
+         Function evaluations: 140                                                         
+  Loss:88.35154402682195 , Regularisation:0.0 ☚||||Optimization terminated successfully.
+         Current function value: 88.279619
+         Iterations: 19
+         Function evaluations: 42
+  Loss:78.61851566706419 , Regularisation:0.0 ☚||||Optimization terminated successfully.   
+         Current function value: 78.599198                                                 
+         Iterations: 55                                                                    
+         Function evaluations: 146                                                         
+  Loss:99.97758893741533 , Regularisation:0.00021417162186472094 ☚||||Optimization terminated successfully.
+         Current function value: 99.952701
+         Iterations: 57
+         Function evaluations: 143
+Time taken:  66.92654752731323
+
+
+
+
+
+Iteration N:  9 / 10
+  Loss:96.67871885596344 , Regularisation:0.0 ☚||||Optimization terminated successfully.   
+         Current function value: 96.678719                                                 
+         Iterations: 48                                                                    
+         Function evaluations: 148                                                         
+  Loss:101.04709973131025 , Regularisation:0.0 ☚||||Optimization terminated successfully.
+         Current function value: 100.923749
+         Iterations: 20
+         Function evaluations: 45
+  Loss:78.53124569665923 , Regularisation:0.0 ☚||||Optimization terminated successfully.   
+         Current function value: 78.522471                                                 
+         Iterations: 73                                                                    
+         Function evaluations: 172                                                         
+  Loss:68.17117928757966 , Regularisation:0.00027063272461254437 ☚||||Optimization terminated successfully.
+         Current function value: 68.159697
+         Iterations: 104
+         Function evaluations: 225
+Time taken:  80.22617530822754
+
+
+
+
+
+Iteration N:  10 / 10
+  Loss:96.6601984126984 , Regularisation:0.0 ☚||||Optimization terminated successfully.    
+         Current function value: 96.660198                                                 
+         Iterations: 46                                                                    
+         Function evaluations: 144                                                         
+  Loss:94.41897218076761 , Regularisation:0.0 ☚||||Optimization terminated successfully.
+         Current function value: 94.115043
+         Iterations: 27
+         Function evaluations: 63
+  Loss:78.77954693493523 , Regularisation:0.0 ☚||||Optimization terminated successfully.
+         Current function value: 78.771353
+         Iterations: 77
+         Function evaluations: 187
+  Loss:102.07293358846078 , Regularisation:5.363822234303534e-05 ☚||||Optimization terminated successfully.
+         Current function value: 101.990792
+         Iterations: 46
+         Function evaluations: 119
+Time taken:  97.38857531547546
+
+
+
+
+
+
+
+
+
+
+
+
+Minimum Loss:  35.62635854341737
+Parameters  [-0.25, -0.25, 0, 0, 0, 0.5464312371352942, 0.5089438150779929, -0.25, -0.25, 0, 0, 0, 0.04239561891066475, 0.14828700959412922]
+Time taken:  663.0656878948212  seconds
+
+
+
+Resized:0.4x0.4
+
+        scale_alpha = 0.001
+        shear_aplha = 0.001
+        distance_alpha = 0.005
+
+Loss with nonscaled:
+Loss:54.248019581664444 , Regularisation:0.0 ☚||||54.248019581664444
