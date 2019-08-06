@@ -26,8 +26,8 @@ class ImageStitcher:
         self.img1 = img1
         self.img2 = img2
         if (resize):
-            self.img1 = cv2.resize(self.img1,None,fx=0.4,fy=0.4)
-            self.img2 = cv2.resize(self.img2,None,fx=0.4,fy=0.4)
+            self.img1 = cv2.resize(self.img1,None,fx=0.9,fy=0.9)
+            self.img2 = cv2.resize(self.img2,None,fx=0.9,fy=0.9)
         self.h1, self.w1 = self.img1.shape[:2]
         self.h2, self.w2 = self.img2.shape[:2]
         self.img2_canvas_size = int(math.sqrt(math.pow(self.h2,2)+math.pow(self.w2,2)))
@@ -56,12 +56,14 @@ class ImageStitcher:
         return [s_x,s_y,a,b,thetha,t_x,t_y, s_x1,s_y1,a1,b1,thetha1,t_x1,t_y1]
 
     def regularise(self,parameters, distance):
-        scale_alpha = 0.001
+        scale_alpha = 0.005
         shear_aplha = 0.001
-        distance_alpha = 0.005
+        distance_alpha = 5000
+        rotation_alpha = 0.00001
         regularisation = (math.pow(parameters[2],2)+math.pow(parameters[3],2)+math.pow(parameters[9],2)+math.pow(parameters[10],2))*shear_aplha
         + distance*distance_alpha
         + (math.pow(parameters[0],2)+math.pow(parameters[1],2)+math.pow(parameters[7],2)+math.pow(parameters[8],2))*scale_alpha
+        + (math.pow(parameters[4],2)+math.pow(parameters[11],2))*rotation_alpha
         return regularisation
 
 
@@ -160,12 +162,37 @@ class ImageStitcher:
         parameters[12], parameters[13] = t_x1, t_y1
         return self.calculateLoss(parameters)
     
+    def minimise_translation(self):
+        for k in range(100):
+            t = [random.uniform(0,0.5) for j in range(4)]
+            res = minimize(self.optimese_translations,t, method = 'nelder-mead', options={'disp':True, 'adaptive':True, 'fatol':10})
+            if (res.fun == self.max_possible_error):
+                self.clear_previous_iteration()
+                continue
+            if (self.best_loss>res.fun):
+                self.best_loss = res.fun
+                self.best_parameters[5], self.best_parameters[6] = res.x[0], res.x[1]
+                self.best_parameters[12], self.best_parameters[13] = res.x[2], res.x[3]
+            break
+
     def optimese_rotation(self, passed_values):
         thetha, thetha1 = passed_values
         parameters = self.best_parameters.copy()
         parameters[4], parameters[11] = thetha, thetha1
         return self.calculateLoss(parameters)
         
+    def minimise_rotation(self):
+        for k in range(100):
+            r = [random.uniform(0,0.5) for j in range(2)]
+            res = minimize(self.optimese_rotation,r, method = 'nelder-mead', options={'disp':True, 'adaptive':True, 'fatol':10})
+            if (res.fun == self.max_possible_error):
+                self.clear_previous_iteration()
+                continue
+            if (self.best_loss>res.fun):
+                self.best_loss = res.fun
+                self.best_parameters[4], self.best_parameters[11] = res.x[0], res.x[1]
+            break
+    
     def optimese_scale(self, passed_values):
         s_x, s_y, s_x1, s_y1 = passed_values
         parameters = self.best_parameters.copy()
@@ -173,6 +200,19 @@ class ImageStitcher:
         parameters[7], parameters[8] = s_x1, s_y1
         return self.calculateLoss(parameters)
     
+    def minimise_scale(self):
+        for k in range(100):
+            s = [random.uniform(0,0.5) for j in range(4)]
+            res = minimize(self.optimese_scale,s, method = 'nelder-mead', options={'disp':True, 'adaptive':True, 'fatol':10})
+            if (res.fun == self.max_possible_error):
+                self.clear_previous_iteration()
+                continue
+            if (self.best_loss>res.fun):
+                self.best_loss = res.fun
+                self.best_parameters[0], self.best_parameters[1] = res.x[0], res.x[1]
+                self.best_parameters[7], self.best_parameters[8] = res.x[2], res.x[3]
+            break
+
     def optimese_shear(self,passed_values):
         a, b, a1, b1 = passed_values
         parameters = self.best_parameters.copy()
@@ -180,61 +220,37 @@ class ImageStitcher:
         parameters[9], parameters[10] = a1, b1
         return self.calculateLoss(parameters)
 
+    def minimise_shear(self):
+        for k in range(100):
+            sh = [random.uniform(0,0.5) for j in range(4)]
+            res = minimize(self.optimese_shear,sh, method = 'nelder-mead', options={'disp':True, 'adaptive':True, 'fatol':10})
+            if (res.fun == self.max_possible_error):
+                self.clear_previous_iteration()
+                continue
+            if (self.best_loss>res.fun):
+                self.best_loss = res.fun
+                self.best_parameters[2], self.best_parameters[3] = res.x[0], res.x[1]
+                self.best_parameters[9], self.best_parameters[10] = res.x[2], res.x[3]
+            break
+
+    def run_iteration(self,n,i):
+        print("Iteration N: ",i+1,"/",n)
+        start = time.time()
+        self.minimise_translation()
+        self.minimise_rotation()
+        self.minimise_scale()
+        self.minimise_shear()
+        end = time.time()
+        print("Time taken: ",end-start)
+        print("\n\n\n\n")
+
     def mosaicImages(self,n):
         print("\n\n\n")
         self.set_canvas()
         h,w = self.canvas.shape[:2]
         i=0
-        while (i<n):
-            print("Iteration N: ",i+1,"/",n)
-            start = time.time()
-            for k in range(100):
-                t = [random.uniform(0,0.5) for j in range(4)]
-                res = minimize(self.optimese_translations,t, method = 'nelder-mead', options={'disp':True, 'adaptive':True, 'fatol':10})
-                if (res.fun == self.max_possible_error):
-                    self.clear_previous_iteration()
-                    continue
-                if (self.best_loss>res.fun):
-                    self.best_loss = res.fun
-                    self.best_parameters[5], self.best_parameters[6] = res.x[0], res.x[1]
-                    self.best_parameters[12], self.best_parameters[13] = res.x[2], res.x[3]
-                break
-            for k in range(100):
-                r = [random.uniform(0,0.5) for j in range(2)]
-                res = minimize(self.optimese_rotation,r, method = 'nelder-mead', options={'disp':True, 'adaptive':True, 'fatol':10})
-                if (res.fun == self.max_possible_error):
-                    self.clear_previous_iteration()
-                    continue
-                if (self.best_loss>res.fun):
-                    self.best_loss = res.fun
-                    self.best_parameters[4], self.best_parameters[11] = res.x[0], res.x[1]
-                break
-            for k in range(100):
-                s = [random.uniform(0,0.5) for j in range(4)]
-                res = minimize(self.optimese_scale,s, method = 'nelder-mead', options={'disp':True, 'adaptive':True, 'fatol':10})
-                if (res.fun == self.max_possible_error):
-                    self.clear_previous_iteration()
-                    continue
-                if (self.best_loss>res.fun):
-                    self.best_loss = res.fun
-                    self.best_parameters[0], self.best_parameters[1] = res.x[0], res.x[1]
-                    self.best_parameters[7], self.best_parameters[8] = res.x[2], res.x[3]
-                break
-            for k in range(100):
-                sh = [random.uniform(0,0.5) for j in range(4)]
-                res = minimize(self.optimese_shear,sh, method = 'nelder-mead', options={'disp':True, 'adaptive':True, 'fatol':10})
-                if (res.fun == self.max_possible_error):
-                    self.clear_previous_iteration()
-                    continue
-                if (self.best_loss>res.fun):
-                    self.best_loss = res.fun
-                    self.best_parameters[2], self.best_parameters[3] = res.x[0], res.x[1]
-                    self.best_parameters[9], self.best_parameters[10] = res.x[2], res.x[3]
-                break
-            i+=1
-            end = time.time()
-            print("Time taken: ",end-start)
-            print("\n\n\n\n")
+        for i in range(n):
+            self.run_iteration(n,i)
         print("\n\n\n\n\n\n")
         print("Minimum Loss: ",self.best_loss)
         print("Parameters ",self.best_parameters)

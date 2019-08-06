@@ -1,0 +1,21 @@
+Minimum Loss:  98.88064813283889
+Parameters  [-0.25, -0.25, 0, 0, 0.321394890387395, 0.47406532624089387, 0.5099587479866017, -0.25, -0.25, 0, 0, 0.39726731303966134, 0.05597342378752669, 0.07505684392441439]
+(venv) ri31@pc5-023-l:~/project-scripts $ python3 test_coor_system.py 
+H1:  835   W1:  703 
+H2:  807   W2:  1163
+
+
+
+
+Iteration N:  1 / 1
+  Loss:100.18430880222924 , Regularisation:0.0 ☚||||100.18430880222924
+
+133.68746161460876*20
+
+    def regularise(self,parameters, distance):
+        scale_alpha = 0.0005
+        shear_aplha = 0.001
+        distance_alpha = 10
+        rotation_alpha = 0.0005
+
+30x30

@@ -5,15 +5,18 @@ from random import randrange
 
 #https://towardsdatascience.com/image-stitching-using-opencv-817779c86a83
 
-img_ = cv2.imread("Map1.png")
+img_ = cv2.imread("gradient1.png")
 img1 = cv2.cvtColor(img_,cv2.COLOR_BGR2GRAY)
-img = cv2.imread("Map2.png")
+img = cv2.imread("gradient2.png")
 img2 = cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
 
 sift = cv2.xfeatures2d.SIFT_create()
 #USE sift to find the keypoints
 kp1, des1 = sift.detectAndCompute(img1,None)
 kp2, des2 = sift.detectAndCompute(img2,None)
+img = cv2.drawKeypoints(img1, kp1)
+
+cv2.imwrite('sift.jpg', img)
 
 bf = cv2.BFMatcher()
 matches = bf.knnMatch(des1,des2, k=2)
