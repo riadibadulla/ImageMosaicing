@@ -176,6 +176,7 @@ class ImageStitcher:
                 self.best_parameters[5], self.best_parameters[6] = res.x[0], res.x[1]
                 self.best_parameters[12], self.best_parameters[13] = res.x[2], res.x[3]
             break
+        return (self.best_loss, self.best_parameters)
 
     def optimese_rotation(self, passed_values):
         thetha, thetha1 = passed_values
@@ -194,6 +195,7 @@ class ImageStitcher:
                 self.best_loss = res.fun
                 self.best_parameters[4], self.best_parameters[11] = res.x[0], res.x[1]
             break
+        return (self.best_loss, self.best_parameters)
     
     def optimese_scale(self, passed_values):
         s_x, s_y, s_x1, s_y1 = passed_values
@@ -214,6 +216,7 @@ class ImageStitcher:
                 self.best_parameters[0], self.best_parameters[1] = res.x[0], res.x[1]
                 self.best_parameters[7], self.best_parameters[8] = res.x[2], res.x[3]
             break
+        return (self.best_loss, self.best_parameters)
 
     def optimese_shear(self,passed_values):
         a, b, a1, b1 = passed_values
@@ -234,6 +237,7 @@ class ImageStitcher:
                 self.best_parameters[2], self.best_parameters[3] = res.x[0], res.x[1]
                 self.best_parameters[9], self.best_parameters[10] = res.x[2], res.x[3]
             break
+        return (self.best_loss, self.best_parameters)
 
     def run_iteration(self,n,i):
         print("Iteration N: ",i+1,"/",n)
@@ -250,15 +254,21 @@ class ImageStitcher:
         end = time.time()
         print("Time taken: ",end-start)
         print("\n\n\n\n")
+        return [self.best_loss, self.best_parameters]
 
     def mosaicImages(self,n):
         print("\n\n\n")
         self.set_canvas()
         h,w = self.canvas.shape[:2]
         i=0
-        Parallel(n_jobs=1, prefer="processes")(delayed(self.run_iteration)(n,i) for i in range(n))
+        values = Parallel(n_jobs=4, prefer="processes")(delayed(self.run_iteration)(n,i) for i in range(n))
         # for i in range(n):
         #     self.run_iteration(n,i)
+        values = np.array(values)
+        index = np.argmin(values, axis=0)[0]
+        self.best_loss = values[index][0]
+        self.best_parameters = values[index][1]
+
         print("\n\n\n\n\n\n")
         print("Minimum Loss: ",self.best_loss)
         print("Parameters ",self.best_parameters)
