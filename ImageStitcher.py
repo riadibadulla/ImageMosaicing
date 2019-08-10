@@ -238,10 +238,15 @@ class ImageStitcher:
     def run_iteration(self,n,i):
         print("Iteration N: ",i+1,"/",n)
         start = time.time()
-        self.minimise_translation()
-        self.minimise_rotation()
-        self.minimise_scale()
-        self.minimise_shear()
+        number = random.randint(1,4)
+        if (number == 1):
+            self.minimise_translation()
+        elif (number==2):
+            self.minimise_rotation()
+        elif (number==3):
+            self.minimise_scale()
+        else:
+            self.minimise_shear()
         end = time.time()
         print("Time taken: ",end-start)
         print("\n\n\n\n")
