@@ -6,7 +6,6 @@ from scipy.optimize import brute
 import random
 import math
 from CoordinateSystem import CoordinateSystem
-import random
 import sys
 from joblib import Parallel, delayed
 
@@ -16,18 +15,19 @@ class ImageStitcher:
     img2_canvas_size = None
     h1,h2,w1,w2 = 0,0,0,0
     canvas = None
-    coor_system = None
-    best_loss = None
-    best_parameters = [-0.25,-0.25,0,0,0,0,0,-0.25,-0.25,0,0,0,0,0]
+    
+    best_loss = 0
+    best_parameters = [-0.25,-0.25,0,0,0,0, 0,-0.25,-0.25,0,0,0,0,0]
 
     max_possible_error = 0
 
     def __init__(self, img1, img2, resize):
         self.img1 = img1
         self.img2 = img2
+        random.seed(901)
         if (resize):
-            self.img1 = cv2.resize(self.img1,None,fx=0.9,fy=0.9)
-            self.img2 = cv2.resize(self.img2,None,fx=0.9,fy=0.9)
+            self.img1 = cv2.resize(self.img1,None,fx=0.3,fy=0.3)
+            self.img2 = cv2.resize(self.img2,None,fx=0.3,fy=0.3)
         self.h1, self.w1 = self.img1.shape[:2]
         self.h2, self.w2 = self.img2.shape[:2]
         self.img2_canvas_size = int(math.sqrt(math.pow(self.h2,2)+math.pow(self.w2,2)))
@@ -56,10 +56,10 @@ class ImageStitcher:
         return [s_x,s_y,a,b,thetha,t_x,t_y, s_x1,s_y1,a1,b1,thetha1,t_x1,t_y1]
 
     def regularise(self,parameters, distance):
-        scale_alpha = 0.005
-        shear_aplha = 0.001
-        distance_alpha = 5000
-        rotation_alpha = 0.00001
+        scale_alpha = 0.5
+        shear_aplha = 0.5
+        distance_alpha = 1000
+        rotation_alpha = 30
         regularisation = (math.pow(parameters[2],2)+math.pow(parameters[3],2)+math.pow(parameters[9],2)+math.pow(parameters[10],2))*shear_aplha
         + distance*distance_alpha
         + (math.pow(parameters[0],2)+math.pow(parameters[1],2)+math.pow(parameters[7],2)+math.pow(parameters[8],2))*scale_alpha
@@ -69,9 +69,12 @@ class ImageStitcher:
 
     def calculateLoss(self,parameters):
         #sys.stdout.write("\r Parameters:{0}      ☚||||".format(parameters[:]))
+        coor_system = CoordinateSystem((len(self.canvas[0])/2,len(self.canvas)/2))
+        coor_system.set_canvas(self.canvas.shape[:2])
+
         parameters = self.unnormalise(parameters)
-        self.coor_system.set_rectangles(self.getCornersOfImages())
-        coordinates_of_intersection = self.coor_system.get_indecies_on_rotate(parameters)
+        coor_system.set_rectangles(self.getCornersOfImages())
+        coordinates_of_intersection = coor_system.get_indecies_on_rotate(parameters)
         if (coordinates_of_intersection == -1):
             return self.max_possible_error
         difference = np.square(np.subtract(self.canvas[coordinates_of_intersection[0]],self.canvas[coordinates_of_intersection[1]]))
@@ -144,8 +147,7 @@ class ImageStitcher:
         self.w1+int((self.img2_canvas_size-self.w2)/2):self.w1+self.w2+int((self.img2_canvas_size-self.w2)/2),
         :3] = self.img2
         self.canvas[:self.h1,:self.w1,:3] = self.img1
-        self.coor_system = CoordinateSystem((len(self.canvas[0])/2,len(self.canvas)/2))
-        self.coor_system.set_canvas(self.canvas.shape[:2])
+    
 
     def clear_previous_iteration(self):
         for j in range(4):
@@ -249,8 +251,9 @@ class ImageStitcher:
         self.set_canvas()
         h,w = self.canvas.shape[:2]
         i=0
-        for i in range(n):
-            self.run_iteration(n,i)
+        Parallel(n_jobs=1, prefer="processes")(delayed(self.run_iteration)(n,i) for i in range(n))
+        # for i in range(n):
+        #     self.run_iteration(n,i)
         print("\n\n\n\n\n\n")
         print("Minimum Loss: ",self.best_loss)
         print("Parameters ",self.best_parameters)
