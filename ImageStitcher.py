@@ -10,6 +10,14 @@ import sys
 from joblib import Parallel, delayed
 
 class ImageStitcher:
+
+    RESIZE_PERCENT = 0.3
+    SCALE_ALPHA = 0.5
+    SHEAR_ALPHA = 0.5
+    DISTANCE_ALPHA = 1000
+    ROTATION_ALPHA = 30
+
+
     img1 = None
     img2 = None
     img2_canvas_size = None
@@ -26,8 +34,8 @@ class ImageStitcher:
         self.img2 = img2
         random.seed(901)
         if (resize):
-            self.img1 = cv2.resize(self.img1,None,fx=0.3,fy=0.3)
-            self.img2 = cv2.resize(self.img2,None,fx=0.3,fy=0.3)
+            self.img1 = cv2.resize(self.img1,None,fx=self.RESIZE_PERCENT ,fy=self.RESIZE_PERCENT)
+            self.img2 = cv2.resize(self.img2,None,fx=self.RESIZE_PERCENT,fy= self.RESIZE_PERCENT)
         self.h1, self.w1 = self.img1.shape[:2]
         self.h2, self.w2 = self.img2.shape[:2]
         self.img2_canvas_size = int(math.sqrt(math.pow(self.h2,2)+math.pow(self.w2,2)))
@@ -56,10 +64,10 @@ class ImageStitcher:
         return [s_x,s_y,a,b,thetha,t_x,t_y, s_x1,s_y1,a1,b1,thetha1,t_x1,t_y1]
 
     def regularise(self,parameters, distance):
-        scale_alpha = 0.5
-        shear_aplha = 0.5
-        distance_alpha = 1000
-        rotation_alpha = 30
+        scale_alpha = self.SCALE_ALPHA
+        shear_aplha = self.SHEAR_ALPHA
+        distance_alpha = self.DISTANCE_ALPHA
+        rotation_alpha = self.ROTATION_ALPHA
         regularisation = (math.pow(parameters[2],2)+math.pow(parameters[3],2)+math.pow(parameters[9],2)+math.pow(parameters[10],2))*shear_aplha
         + distance*distance_alpha
         + (math.pow(parameters[0],2)+math.pow(parameters[1],2)+math.pow(parameters[7],2)+math.pow(parameters[8],2))*scale_alpha
@@ -242,26 +250,22 @@ class ImageStitcher:
     def run_iteration(self,n,i):
         print("Iteration N: ",i+1,"/",n)
         start = time.time()
-        number = random.randint(1,4)
-        if (number == 1):
-            self.minimise_translation()
-        elif (number==2):
-            self.minimise_rotation()
-        elif (number==3):
-            self.minimise_scale()
-        else:
-            self.minimise_shear()
+        self.minimise_translation()
+        self.minimise_rotation()
+        self.minimise_scale()
+        self.minimise_shear()
         end = time.time()
         print("Time taken: ",end-start)
         print("\n\n\n\n")
         return [self.best_loss, self.best_parameters]
 
+   
     def mosaicImages(self,n):
         print("\n\n\n")
         self.set_canvas()
         h,w = self.canvas.shape[:2]
         i=0
-        values = Parallel(n_jobs=4, prefer="processes")(delayed(self.run_iteration)(n,i) for i in range(n))
+        values = Parallel(n_jobs=1, prefer="processes")(delayed(self.run_iteration)(n,i) for i in range(n))
         # for i in range(n):
         #     self.run_iteration(n,i)
         values = np.array(values)

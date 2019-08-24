@@ -1,7 +1,0 @@
-Error Index:  3
-Minimum Loss:  38.35662123415998
-Shift_X:  950.3292222034258
-Shift_Y:  660.5029888402157
-Thetha:  360.9953491710828
-Time taken:  273.9489314556122  seconds
-

@@ -1,9 +1,0 @@
-Minimum Loss:  83.43731786496275
-Parameters  [0.03132196013121195, 0.4275188099521132, 0, 0, 0, 0.2798916729898177, 0.4864466389126254, 0.4252568154396784, 0.42706097156839434, 0, 0, 0, -0.10313172593186057, 0.12535100248333483]
-Time taken:  7323.592557668686  seconds
-
-0.4x0.4
-
-regularisation = (math.pow(parameters[2],2)+
-        math.pow(parameters[3],2)+math.pow(parameters[9],2)+math.pow(parameters[10],2))*0.001+coordinates_of_intersection[2]*0.005
-        loss = loss + regularisation
